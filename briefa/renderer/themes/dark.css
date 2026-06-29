@@ -220,11 +220,13 @@ html, body {
 
 /* ═══════════ SCENE COMMON ═══════════ */
 /* Vertical bounds tuned cho safe zone FB Reels (top 270 / bottom 500 reserved).
-   top:380 = dưới profile-chip+gap.  bottom:700 = trên subtitle+gap.
-   Vertical zone = 1920 - 380 - 700 = 840px (giảm ~37% so v17 — autoFit co text). */
+   top:380 = dưới profile-chip+gap. bottom:380 (was 700) = trên citation-chip
+   (bottom:300) + breath. Transcript ticker removed engine-wide 2026-06-29,
+   so the scene reclaims ~320px of vertical content room.
+   Vertical zone = 1920 - 380 - 380 = 1160px. */
 .scene {
   top: 380px; left: 60px; right: 60px;
-  bottom: 700px;
+  bottom: 380px;
   display: flex; flex-direction: column;
   align-items: center; justify-content: center;
   gap: 32px;
@@ -385,10 +387,12 @@ html, body {
 }
 
 /* ─── LAYOUT: BulletList ─── */
-/* v31: shrink padding/font để 5 bullets fit trong scene zone 840px */
+/* CEO 2026-06-29: gap 14 → 24 — bullets no longer cramped against each
+   other now that scene takes back the transcript space (bottom 700 → 380),
+   ~1160px of vertical room for ≤5 bullets. */
 .bullet-list {
   display: flex; flex-direction: column;
-  gap: 14px;
+  gap: 24px;
   width: 100%;
   max-width: 920px;
 }
