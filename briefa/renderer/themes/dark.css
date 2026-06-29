@@ -388,73 +388,67 @@ html, body {
   color: var(--text-soft);
 }
 
-/* ─── LAYOUT: BulletList — block icon redesign (CEO 2026-06-29 v2) ───
-   Numbered badges felt fixed/cold. New look replaces them with a SOLID
-   COLOURED BLOCK acting as a visual marker — red / green / amber / cyan
-   rotating per row, with a thin matching accent bar just to the left.
-   No number text shown. Karaoke-active row gets a subtle rounded border
-   instead of a glow.
-   Same palette is reused across dark / bright / corporate so the rhythm
-   stays consistent regardless of theme. */
+/* ─── LAYOUT: BulletList — icon-card redesign (CEO 2026-06-29 v3) ───
+   Per CEO TikTok reference: each bullet is its own subtle dark card with
+   a small squircle "icon box" on the left containing a content-relevant
+   emoji (planner emits per-bullet emoji in scene.slots.bullet_icons —
+   see prompts.py "REPO REVIEW DOCTRINE"). The emoji MEANS the bullet
+   (🔕 cho "không phải chatbot", ∞ cho "trí nhớ dài hạn", 📖 cho "tự
+   học"), not just decoration.
+   Active state = thicker accent border, subtle bg lift. */
 .bullet-list {
   display: flex; flex-direction: column;
-  gap: 22px;
+  gap: 18px;
   width: 100%;
-  max-width: 920px;
+  max-width: 940px;
 }
 .bullet {
-  display: flex; align-items: center; gap: 32px;
-  padding: 14px 28px 14px 28px;
-  background: transparent;
-  border: 2px solid transparent;
-  border-radius: 14px;
-  box-shadow: none;
-  font-family: "Be Vietnam Pro", sans-serif;
-  font-size: 40px; font-weight: 700;
-  color: var(--text, #fff);
-  line-height: 1.25;
-  position: relative;
-  transition: background 0.35s ease, border-color 0.35s ease;
-}
-/* The "icon" is a solid colour block — width-heavy rectangle, slight
-   rounding. ``font-size: 0`` hides the ``01/02/03/04`` text the template
-   pours into it; the block is purely visual. The ``::before`` paints a
-   matching thin accent bar 10 px to the left of the block — the small
-   "flag" detail in the CEO reference. */
-.bullet-num {
-  flex-shrink: 0;
-  width: 100px; height: 70px;
-  border-radius: 5px;
-  position: relative;
-  font-size: 0;
-  color: transparent;
-  text-indent: -9999px;
-  line-height: 0;
-  background: #ef4444;
-  box-shadow: none;
-}
-.bullet-num::before {
-  content: "";
-  position: absolute;
-  left: -10px; top: 4px; bottom: 4px;
-  width: 4px;
-  border-radius: 2px;
-  background: inherit;
-  opacity: 0.85;
-}
-/* 4-colour rotation. Same palette across themes (looks clean on any bg).
-   Override per-theme by re-stating these selectors if you want a custom
-   palette. */
-.bullet:nth-child(4n+1) .bullet-num { background: #ef4444; }
-.bullet:nth-child(4n+2) .bullet-num { background: #22c55e; }
-.bullet:nth-child(4n+3) .bullet-num { background: #f59e0b; }
-.bullet:nth-child(4n+4) .bullet-num { background: #06b6d4; }
-
-/* Karaoke active — thin border around the row + faint bg wash. The active
-   row reads as "selected" without changing the icon block colour. */
-.bullet.bullet-active {
-  border-color: rgba(255, 255, 255, 0.22);
+  display: flex; align-items: center; gap: 28px;
+  padding: 20px 26px;
   background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  border-radius: 18px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  font-family: "Be Vietnam Pro", sans-serif;
+  font-size: 38px; font-weight: 600;
+  color: var(--text, #fff);
+  line-height: 1.28;
+  position: relative;
+  transition: background 0.35s ease, border-color 0.35s ease,
+              transform 0.35s ease;
+}
+/* Icon box — small squircle holding a single emoji glyph. The emoji
+   sizes itself via font-size; box centres it. */
+.bullet-icon {
+  flex-shrink: 0;
+  width: 84px; height: 84px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  display: flex; align-items: center; justify-content: center;
+  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
+               "Twemoji Mozilla", "Noto Sans Symbols 2", system-ui, sans-serif;
+  font-size: 48px;
+  line-height: 1;
+  color: #fff;
+  text-align: center;
+}
+.bullet-text {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+/* Karaoke active — gold accent border + bg lift. The icon doesn't change
+   colour (it carries content meaning, not theme state). */
+.bullet.bullet-active {
+  border-color: var(--gold, #fbbf24);
+  background: rgba(251, 191, 36, 0.10);
+  transform: translateX(6px);
+}
+.bullet.bullet-active .bullet-icon {
+  background: rgba(251, 191, 36, 0.18);
+  border-color: rgba(251, 191, 36, 0.45);
 }
 
 /* ─── LAYOUT: Timeline ─── */
@@ -1266,68 +1260,8 @@ html, body {
 /* Hide all audio offscreen */
 audio.clip { position: absolute; top: -9999px; left: -9999px; }
 
-/* ════════════════════════════════════════════════════════════════════
-   v0.6 BULLET RHYTHM — anh wanted "sinh động hơn" / less "ngột ngạt".
-   Per-bullet rotating colour + size + position so the list reads as
-   a varied composition instead of 4 identical pills. CSS-only — no
-   layout HTML changes; the JS karaoke active class still wins via
-   higher specificity below.
-   ════════════════════════════════════════════════════════════════════ */
-
-/* 1. Per-bullet number colour rotates through the channel palette. */
-.bullet:nth-child(4n+1) .bullet-num {
-  background: linear-gradient(135deg, var(--bullet-c1), var(--cyan-glow));
-  box-shadow: 0 6px 22px color-mix(in srgb, var(--bullet-c1) 55%, transparent);
-}
-.bullet:nth-child(4n+2) .bullet-num {
-  background: linear-gradient(135deg, var(--bullet-c2), var(--bullet-c1));
-  box-shadow: 0 6px 22px color-mix(in srgb, var(--bullet-c2) 55%, transparent);
-}
-.bullet:nth-child(4n+3) .bullet-num {
-  background: linear-gradient(135deg, var(--bullet-c3), var(--bullet-c4));
-  box-shadow: 0 6px 22px color-mix(in srgb, var(--bullet-c3) 55%, transparent);
-}
-.bullet:nth-child(4n+4) .bullet-num {
-  background: linear-gradient(135deg, var(--bullet-c4), var(--bullet-c2));
-  box-shadow: 0 6px 22px color-mix(in srgb, var(--bullet-c4) 55%, transparent);
-}
-
-/* 2. Matching coloured LEFT BAR on each card so the eye latches on. */
-.bullet { position: relative; }
-.bullet::before {
-  content: "";
-  position: absolute;
-  left: 0; top: 12%; bottom: 12%;
-  width: 6px;
-  border-radius: 6px;
-}
-.bullet:nth-child(4n+1)::before { background: var(--bullet-c1); }
-.bullet:nth-child(4n+2)::before { background: var(--bullet-c2); }
-.bullet:nth-child(4n+3)::before { background: var(--bullet-c3); }
-.bullet:nth-child(4n+4)::before { background: var(--bullet-c4); }
-
-/* 3. First bullet is the LEAD — a touch larger + bolder + heavier shadow
-      so the eye starts there instead of treating the list as 4 equals. */
-.bullet:first-child {
-  font-size: 38px;
-  font-weight: 800;
-  padding: 22px 32px;
-  box-shadow: 0 8px 32px color-mix(in srgb, var(--bullet-c1) 28%, transparent);
-}
-.bullet:first-child .bullet-num {
-  width: 66px; height: 66px;
-  font-size: 30px;
-}
-
-/* 4. Subtle horizontal stagger + rotation so the list breathes. */
-.bullet:nth-child(odd)  { margin-left: 0;    transform: rotate(-0.35deg); }
-.bullet:nth-child(even) { margin-left: 24px; transform: rotate(0.35deg); }
-
-/* 5. Karaoke active wins via higher specificity (already in dark.css above
-      via .bullet.bullet-active — re-state here so our new transforms don't
-      override the active state's gradient or kill its halo). */
-.bullet.bullet-active {
-  margin-left: 0;
-  transform: rotate(0deg) scale(1.02);
-  z-index: 5;
-}
+/* Legacy v0.6 BULLET RHYTHM block (per-bullet colour rotation, ::before
+   bars, first-child lead, stagger/rotation) was REMOVED 2026-06-29 v3
+   when bullets switched to the emoji-icon card style. Those rules
+   targeted ``.bullet-num`` which no longer exists in the template, and
+   fought the new card chrome via CSS specificity. Don't restore them. */

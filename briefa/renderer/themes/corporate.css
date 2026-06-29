@@ -226,15 +226,19 @@ html, body {
 }
 .big-stat-unit { color: var(--pink-hot); }   /* amber */
 
-/* ──────────────────── Bullets — block icon redesign (CEO 2026-06-29 v2) ────────────────────
- * Inherits dark.css's block style verbatim (solid colour blocks rotating
- * red / green / amber / cyan, no number text). Only the karaoke-active
- * border is re-tinted with the corporate cyan so the active row feels
- * consistent with the rest of the corporate accent palette.
+/* ──────────────────── Bullets — icon-card redesign (CEO 2026-06-29 v3) ────────────────────
+ * Inherits dark.css's icon-card structure verbatim (squircle icon box +
+ * emoji from planner.bullet_icons). Only re-tints the karaoke-active row
+ * with corporate cyan so it stays consistent with the cyan accent palette.
  */
 .bullet.bullet-active {
+  border-color: rgba(0, 212, 255, 0.60);
+  background: rgba(0, 212, 255, 0.08);
+  transform: translateX(6px);
+}
+.bullet.bullet-active .bullet-icon {
+  background: rgba(0, 212, 255, 0.12);
   border-color: rgba(0, 212, 255, 0.45);
-  background: rgba(0, 212, 255, 0.07);
 }
 
 /* ──────────────────── Chips & tags ──────────────────── */

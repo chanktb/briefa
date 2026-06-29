@@ -213,6 +213,26 @@ BigStatCard — Spotlight ONE real number HUGE. (e.g. "134K sao" or "9.2K forks"
              USE ONLY when github_stats present. big_value must be the EXACT stars number
              (use display short "134K"). chips_grid = formats/topics list (4 or 8 items).
 BulletList — 3-5 short points. Best for "list of things", features, options.
+             **bullet_icons rule (CEO 2026-06-29)**: emit a parallel list of
+             emoji icons, ONE per bullet, length must match `bullets`. Each
+             emoji must MEAN the bullet — pick by semantic concept, not
+             decoration. Pick a single concrete emoji per bullet; do NOT
+             stack 2 emojis. Examples (anchor your choice on the IDEA, not
+             a literal word):
+               • "Khác biệt với chatbot thông thường" → 🔕 (or 🚫🤖)
+               • "Trí nhớ dài hạn vượt thời gian"     → ∞ (or 🧠 or ⏳)
+               • "Tự học thực tế thành kỹ năng"        → 📖 (or 🎓 or 🛠️)
+               • "Tự động hoá toàn diện"               → ⚙️ (or 🤖)
+               • "An toàn / kiểm soát chặt"            → 🛡️ (or 🔒)
+               • "Tốc độ / real-time"                  → ⚡ (or 🚀)
+               • "Phân tích dữ liệu"                   → 📊 (or 🔍)
+               • "Lập kế hoạch"                        → 🗺️ (or 📅)
+               • "Tăng trưởng / scale"                 → 📈 (or 🚀)
+               • "Tích hợp / kết nối"                  → 🔗 (or 🧩)
+             If you truly can't match an idea, fall back to a generic
+             pointer like ▸ or • for that ONE bullet (don't fall back for
+             ALL of them — every bullet should still earn a unique icon
+             whenever possible).
              **CRITICAL voice_script rule for BulletList**:
              - Structure: <1 intro sentence> + <1 sentence per bullet, in order> + <optional 1 outro>.
              - Total sentences = N+1 (N = number of bullets) or N+2 if outro.
@@ -221,6 +241,7 @@ BulletList — 3-5 short points. Best for "list of things", features, options.
              - Bot automatically karaoke-highlights bullets in sync with voice timing — voice MUST
                address bullets in same order as bullets array.
              - Example: bullets=["A/B test tiêu đề", "Refine audience", "Scale theo ROAS"]
+               bullet_icons=["🧪", "🎯", "📈"]
                voice_script="Có 3 chiến lược tối ưu Google Ads. Đầu tiên, A/B test tiêu đề tăng CTR rõ rệt.
                Tiếp theo, refine audience giúp giảm CPA. Cuối cùng, scale budget khi đạt target ROAS."
 KPIGrid    — 2-4 metric cards. Best for stats, comparisons, key numbers, attributes.
@@ -399,6 +420,75 @@ official GitHub REST API — they are GROUND TRUTH. Use them EXACTLY:
 NEVER override GITHUB_REPO_STATS with numbers from ADDITIONAL_RESEARCH or your own
 knowledge — the API data is the truth at the time of generation. If
 ADDITIONAL_RESEARCH contradicts GITHUB_REPO_STATS, trust the API.
+
+═══════════════════════════════════════════════════════════════════
+REPO REVIEW DOCTRINE (CEO 2026-06-29) — "deep dive, not cookie-cutter"
+═══════════════════════════════════════════════════════════════════
+
+When SOURCE is a GitHub repo (GITHUB_REPO_STATS or `github.com/...` URL),
+the video must read like an analyst who actually CLONED + READ the repo,
+not a README skimmer. Reference style: @escbase's TikTok tech reviews —
+they read the repo, identify the architecture and real-world flow, then
+talk about WHAT IT DOES + HOW IT WORKS + WHY IT MATTERS.
+
+⚖️ HIGH-STAR vs NEW-STAR — DIFFERENT EMPHASIS
+
+Pick this fork the moment you look at GITHUB_REPO_STATS.stars:
+
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  HIGH-STAR (≥ 3,000 stars)                                       │
+  │  ─────────────────────────                                       │
+  │  • Stars get ONE scene (BigStatCard or one KPIGrid cell).        │
+  │    Quick acknowledgement: "47K sao, hot trên GitHub".            │
+  │  • The REMAINING 4-7 scenes lean HARD into:                      │
+  │      – core capabilities (BulletList — what it can DO)           │
+  │      – workflow / pipeline (Timeline — how a request flows)      │
+  │      – install + usage (TerminalWindow — real commands)          │
+  │      – architecture decisions worth calling out                  │
+  │      – differentiator vs the 2-3 popular alternatives            │
+  │  • Don't pad with stars metadata (forks/issues/license) — those  │
+  │    are footnotes, not the story.                                 │
+  └─────────────────────────────────────────────────────────────────┘
+  ┌─────────────────────────────────────────────────────────────────┐
+  │  NEW / SMALL (< 3,000 stars, or < 6 months old)                  │
+  │  ───────────────────────────────────────────────                 │
+  │  • DO NOT lead with stars / forks / hot-status. Skip BigStatCard │
+  │    entirely; cells in KPIGrid go to PROBLEM-SOLVED metrics       │
+  │    instead (e.g. "0 deps", "1 file", "MIT", "ready in 30s").     │
+  │  • Scenes focus on the PROBLEM the repo solves + the SOLUTION    │
+  │    its code actually implements. Hook in scene 1 is "what pain   │
+  │    does this fix", not "look at this repo".                      │
+  │  • BulletList items are concrete capabilities + author's design  │
+  │    choices (e.g. "không cần Docker", "chạy local 100%").         │
+  │  • TerminalWindow scene if there's a real install command —      │
+  │    that's how a new viewer evaluates a small repo.               │
+  │  • CTAOutro: invite to "thử ngay" / "star nếu hợp" — NOT "FOMO   │
+  │    đang trending".                                               │
+  └─────────────────────────────────────────────────────────────────┘
+
+🔬 RESEARCH DEPTH PER SCENE (BOTH FORKS)
+
+- Each BulletList / Timeline / KPIGrid scene must surface a SPECIFIC fact
+  pulled from README, code structure, or ADDITIONAL_RESEARCH — never a
+  generic phrase like "đầy đủ tính năng" or "phổ biến trong cộng đồng".
+- If you find yourself writing a vague filler line, STOP. Either pick a
+  concrete capability/architecture choice from the source, or drop the
+  scene.
+- For each capability: name the IDEA in the bullet, prove it in the
+  voice_script with a fact ("…với cơ chế retrieval RAG", "…dùng SQLite
+  thay vì Postgres để chạy local"). Bullet_icons reinforce the idea
+  (🧠 cho memory, ⚙️ cho automation, 🛡️ cho safety).
+
+⛔ ANTI-PATTERN — what NOT to do
+
+- ❌ "Repo có {stars} sao, được nhiều người yêu thích" (vague, low-info)
+- ❌ Listing stars / forks / issues / license back-to-back as if reading
+   the GitHub sidebar.
+- ❌ "README rất chi tiết và đầy đủ" (you're describing the doc, not the
+   product).
+- ❌ Closing on "Hãy ghé repo và xem thử nhé" (no analysis hook).
+- ✅ "Hermes định vị là Agent tự hành — không phải chatbot — với trí nhớ
+   dài hạn lưu state qua nhiều phiên." (specific, derived from reading.)
 
 You decide content_type from the WHOLE source (raw + research), plan scenes, output JSON.
 """

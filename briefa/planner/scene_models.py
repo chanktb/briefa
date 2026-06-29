@@ -67,11 +67,31 @@ class TitleHeroSlots(BaseModel):
 
 
 class BulletListSlots(BaseModel):
-    """3-4 short numbered points."""
+    """3-4 short points each marked with a content-relevant emoji icon."""
     model_config = ConfigDict(extra="forbid")
     section_title: str = Field(..., max_length=40)
     highlight_word: str = Field("", max_length=20)
     bullets: list[str] = Field(..., min_length=3, max_length=4)
+    bullet_icons: list[str] = Field(
+        default_factory=list,
+        description=(
+            "Parallel list of emoji icons (1 per bullet), each one chosen "
+            "to match its bullet's semantic meaning (e.g. 🔕 for 'not a "
+            "chatbot', ∞ for 'long memory', 📖 for 'self-learning'). "
+            "Empty list = fallback to a generic ▸ glyph for every bullet "
+            "(back-compat with old planner outputs). When provided, length "
+            "must match ``bullets``."
+        ),
+    )
+
+    @model_validator(mode="after")
+    def _icons_match_bullets(self) -> "BulletListSlots":
+        if self.bullet_icons and len(self.bullet_icons) != len(self.bullets):
+            raise ValueError(
+                f"bullet_icons length ({len(self.bullet_icons)}) must match "
+                f"bullets length ({len(self.bullets)}), or be empty for fallback."
+            )
+        return self
 
 
 class KPIItem(BaseModel):

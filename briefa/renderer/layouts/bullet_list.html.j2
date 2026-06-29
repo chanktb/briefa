@@ -6,9 +6,12 @@
     {{ scene.slots.section_title | highlight(scene.slots.highlight_word) }}
   </div>
   <div class="bullet-list" id="scene-{{ scene.scene_index }}-list">
+    {%- set _icons = scene.slots.bullet_icons or [] -%}
     {% for bullet in scene.slots.bullets %}
+    {%- set _icon = _icons[loop.index0] if loop.index0 < _icons|length and _icons[loop.index0] else '▸' -%}
     <div class="bullet" id="scene-{{ scene.scene_index }}-bullet-{{ loop.index }}">
-      <span class="bullet-num" id="scene-{{ scene.scene_index }}-bullet-{{ loop.index }}-num">{{ '%02d'|format(loop.index) }}</span>{{ bullet }}
+      <span class="bullet-icon" id="scene-{{ scene.scene_index }}-bullet-{{ loop.index }}-icon">{{ _icon }}</span>
+      <span class="bullet-text">{{ bullet }}</span>
     </div>
     {% endfor %}
   </div>
