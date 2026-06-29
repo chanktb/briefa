@@ -389,9 +389,9 @@ html, body {
 }
 
 /* ─── LAYOUT: BulletList — #N marker redesign (CEO 2026-06-29 v4) ───
-   Simple ``#1`` ``#2`` markers (gold accent) + strong-contrast white
-   text + larger gap. Per-bullet emoji icons removed (template emits
-   ``#{{ loop.index }}`` in .bullet-num).
+   Simple #1 #2 markers (gold accent) + strong-contrast white text +
+   larger gap. Per-bullet emoji icons removed; the template emits the
+   loop index in .bullet-num.
 
    Two layout modes driven by the .bullet-count-N class on .bullet-list:
    * 2-4 bullets → standard row stack with gap 40 px.
