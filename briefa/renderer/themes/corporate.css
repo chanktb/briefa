@@ -226,63 +226,15 @@ html, body {
 }
 .big-stat-unit { color: var(--pink-hot); }   /* amber */
 
-/* ──────────────────── Bullets — editorial redesign (CEO 2026-06-29) ────────────────────
- * Was white pill cards with a coloured number badge inside. The redesign
- * inherits dark.css's editorial row (no card, big gradient number,
- * hairline divider) and only overrides the four per-bullet number
- * gradients so the cyan / amber / sky / mint corporate palette still
- * rotates row-by-row instead of looking monochrome.
- *
- * Number text stays gradient-clipped to one of the four palette
- * accents; the column-rule bar to its right matches.
+/* ──────────────────── Bullets — block icon redesign (CEO 2026-06-29 v2) ────────────────────
+ * Inherits dark.css's block style verbatim (solid colour blocks rotating
+ * red / green / amber / cyan, no number text). Only the karaoke-active
+ * border is re-tinted with the corporate cyan so the active row feels
+ * consistent with the rest of the corporate accent palette.
  */
-.bullet { color: #ffffff; }
-.bullet:not(:last-child)::after {
-  background: rgba(255, 255, 255, 0.22);
-}
-.bullet:nth-child(4n+1) .bullet-num {
-  background: linear-gradient(135deg, var(--bullet-c1), color-mix(in srgb, var(--bullet-c1) 55%, white));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  border-right-color: var(--bullet-c1);
-}
-.bullet:nth-child(4n+2) .bullet-num {
-  background: linear-gradient(135deg, var(--bullet-c2), color-mix(in srgb, var(--bullet-c2) 55%, white));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  border-right-color: var(--bullet-c2);
-}
-.bullet:nth-child(4n+3) .bullet-num {
-  background: linear-gradient(135deg, var(--bullet-c3), color-mix(in srgb, var(--bullet-c3) 55%, white));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  border-right-color: var(--bullet-c3);
-}
-.bullet:nth-child(4n+4) .bullet-num {
-  background: linear-gradient(135deg, var(--bullet-c4), color-mix(in srgb, var(--bullet-c4) 55%, white));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  border-right-color: var(--bullet-c4);
-}
-
-/* Karaoke active — calm + corporate: just brighten the number, no slide. */
 .bullet.bullet-active {
-  background: transparent;
-  color: #ffffff;
-  transform: none;
-  box-shadow: none;
-}
-.bullet.bullet-active .bullet-num {
-  filter: drop-shadow(0 0 28px rgba(0, 212, 255, 0.55));
-  transform: scale(1.04);
+  border-color: rgba(0, 212, 255, 0.45);
+  background: rgba(0, 212, 255, 0.07);
 }
 
 /* ──────────────────── Chips & tags ──────────────────── */

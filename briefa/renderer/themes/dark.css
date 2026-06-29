@@ -388,81 +388,73 @@ html, body {
   color: var(--text-soft);
 }
 
-/* ─── LAYOUT: BulletList — editorial redesign (CEO 2026-06-29) ───
-   Old style was a uniform row of white pills with a small numbered badge
-   inside — clean, but read as "list of cards" and clustered visually.
-   New style drops the card chrome entirely: huge gradient numeral on the
-   left, hairline divider between rows, generous breathing room. Reads
-   like a magazine list-rule instead of a UI control. Vertical centering
-   is now safe because the freed transcript space (scene-bottom 700→380)
-   gives ~1160px of room, comfortably fitting 5 rows of the bigger style. */
+/* ─── LAYOUT: BulletList — block icon redesign (CEO 2026-06-29 v2) ───
+   Numbered badges felt fixed/cold. New look replaces them with a SOLID
+   COLOURED BLOCK acting as a visual marker — red / green / amber / cyan
+   rotating per row, with a thin matching accent bar just to the left.
+   No number text shown. Karaoke-active row gets a subtle rounded border
+   instead of a glow.
+   Same palette is reused across dark / bright / corporate so the rhythm
+   stays consistent regardless of theme. */
 .bullet-list {
   display: flex; flex-direction: column;
-  gap: 36px;
+  gap: 22px;
   width: 100%;
-  max-width: 940px;
+  max-width: 920px;
 }
-/* Row: no card chrome — number + separator + text. Padding-bottom holds
-   the hairline divider. */
 .bullet {
-  display: flex; align-items: center; gap: 30px;
-  padding: 6px 4px 22px 4px;
+  display: flex; align-items: center; gap: 32px;
+  padding: 14px 28px 14px 28px;
   background: transparent;
-  border: none;
-  border-radius: 0;
+  border: 2px solid transparent;
+  border-radius: 14px;
   box-shadow: none;
   font-family: "Be Vietnam Pro", sans-serif;
   font-size: 40px; font-weight: 700;
   color: var(--text, #fff);
   line-height: 1.25;
   position: relative;
-  transition: transform 0.4s cubic-bezier(0.34, 1.4, 0.64, 1);
+  transition: background 0.35s ease, border-color 0.35s ease;
 }
-/* Hairline divider between rows. Last row keeps the rhythm without one. */
-.bullet:not(:last-child)::after {
-  content: "";
-  position: absolute;
-  left: 0; right: 0; bottom: -18px;
-  height: 1px;
-  background: var(--card-border, rgba(255,255,255,0.18));
-  opacity: 0.55;
-}
-/* Number is the visual hero — big bold gold gradient text, no badge. The
-   vertical bar to its right acts as the column-rule separator. */
+/* The "icon" is a solid colour block — width-heavy rectangle, slight
+   rounding. ``font-size: 0`` hides the ``01/02/03/04`` text the template
+   pours into it; the block is purely visual. The ``::before`` paints a
+   matching thin accent bar 10 px to the left of the block — the small
+   "flag" detail in the CEO reference. */
 .bullet-num {
   flex-shrink: 0;
-  width: auto; min-width: 92px; height: auto;
-  border: none;
-  border-right: 4px solid var(--teal, #22d3ee);
-  border-radius: 0;
-  background: linear-gradient(135deg, var(--gold, #fbbf24), var(--pink-hot, #ef4444));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  width: 100px; height: 70px;
+  border-radius: 5px;
+  position: relative;
+  font-size: 0;
   color: transparent;
-  padding: 0 22px 0 0;
-  font-family: "Be Vietnam Pro", "Inter Tight", "Inter", sans-serif;
-  font-size: 76px; font-weight: 900;
-  line-height: 1;
-  letter-spacing: -2px;
-  text-align: right;
+  text-indent: -9999px;
+  line-height: 0;
+  background: #ef4444;
   box-shadow: none;
-  transition: transform 0.4s cubic-bezier(0.34, 1.4, 0.64, 1),
-              filter 0.4s ease;
 }
+.bullet-num::before {
+  content: "";
+  position: absolute;
+  left: -10px; top: 4px; bottom: 4px;
+  width: 4px;
+  border-radius: 2px;
+  background: inherit;
+  opacity: 0.85;
+}
+/* 4-colour rotation. Same palette across themes (looks clean on any bg).
+   Override per-theme by re-stating these selectors if you want a custom
+   palette. */
+.bullet:nth-child(4n+1) .bullet-num { background: #ef4444; }
+.bullet:nth-child(4n+2) .bullet-num { background: #22c55e; }
+.bullet:nth-child(4n+3) .bullet-num { background: #f59e0b; }
+.bullet:nth-child(4n+4) .bullet-num { background: #06b6d4; }
 
-/* Karaoke active — slide the row right, super-charge the number's glow.
-   No bg change because there's no card to recolour. */
+/* Karaoke active — thin border around the row + faint bg wash. The active
+   row reads as "selected" without changing the icon block colour. */
 .bullet.bullet-active {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  transform: translateX(8px);
-  color: var(--text, #fff);
-}
-.bullet.bullet-active .bullet-num {
-  filter: drop-shadow(0 0 28px rgba(251, 191, 36, 0.65));
-  transform: scale(1.06);
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 /* ─── LAYOUT: Timeline ─── */
