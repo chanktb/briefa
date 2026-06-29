@@ -67,31 +67,24 @@ class TitleHeroSlots(BaseModel):
 
 
 class BulletListSlots(BaseModel):
-    """3-4 short points each marked with a content-relevant emoji icon."""
+    """1-4 short points. Each is rendered with a ``#N`` marker.
+
+    The planner picks the count:
+      * 3-4 bullets in ONE scene for topics that read as a balanced list
+        (the karaoke-active highlight rotates through them).
+      * 1 bullet per scene when there are > 4 distinct points worth
+        spotlighting — each scene then becomes a single-bullet focal
+        beat, and the highlight effect holds on that one bullet the
+        whole scene.
+    """
     model_config = ConfigDict(extra="forbid")
     section_title: str = Field(..., max_length=40)
     highlight_word: str = Field("", max_length=20)
-    bullets: list[str] = Field(..., min_length=3, max_length=4)
-    bullet_icons: list[str] = Field(
-        default_factory=list,
-        description=(
-            "Parallel list of emoji icons (1 per bullet), each one chosen "
-            "to match its bullet's semantic meaning (e.g. 🔕 for 'not a "
-            "chatbot', ∞ for 'long memory', 📖 for 'self-learning'). "
-            "Empty list = fallback to a generic ▸ glyph for every bullet "
-            "(back-compat with old planner outputs). When provided, length "
-            "must match ``bullets``."
-        ),
-    )
-
-    @model_validator(mode="after")
-    def _icons_match_bullets(self) -> "BulletListSlots":
-        if self.bullet_icons and len(self.bullet_icons) != len(self.bullets):
-            raise ValueError(
-                f"bullet_icons length ({len(self.bullet_icons)}) must match "
-                f"bullets length ({len(self.bullets)}), or be empty for fallback."
-            )
-        return self
+    bullets: list[str] = Field(..., min_length=1, max_length=4)
+    # Deprecated 2026-06-29 (CEO switched to ``#N`` markers). Field kept
+    # for back-compat with cached planner outputs / older render jobs —
+    # template ignores it. Safe to remove in a later cleanup.
+    bullet_icons: list[str] = Field(default_factory=list)
 
 
 class KPIItem(BaseModel):

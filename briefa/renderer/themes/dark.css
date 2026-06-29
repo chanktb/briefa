@@ -388,50 +388,54 @@ html, body {
   color: var(--text-soft);
 }
 
-/* ─── LAYOUT: BulletList — icon-card redesign (CEO 2026-06-29 v3) ───
-   Per CEO TikTok reference: each bullet is its own subtle dark card with
-   a small squircle "icon box" on the left containing a content-relevant
-   emoji (planner emits per-bullet emoji in scene.slots.bullet_icons —
-   see prompts.py "REPO REVIEW DOCTRINE"). The emoji MEANS the bullet
-   (🔕 cho "không phải chatbot", ∞ cho "trí nhớ dài hạn", 📖 cho "tự
-   học"), not just decoration.
-   Active state = thicker accent border, subtle bg lift. */
+/* ─── LAYOUT: BulletList — #N marker redesign (CEO 2026-06-29 v4) ───
+   Simple ``#1`` ``#2`` markers (gold accent) + strong-contrast white
+   text + larger gap. Per-bullet emoji icons removed (template emits
+   ``#{{ loop.index }}`` in .bullet-num).
+
+   Two layout modes driven by the .bullet-count-N class on .bullet-list:
+   * 2-4 bullets → standard row stack with gap 40 px.
+   * 1 bullet (focal-beat scene, used when topic has >4 points and the
+     planner splits into multiple single-bullet BulletList scenes) →
+     centred focal block with bigger number + bigger text. */
 .bullet-list {
   display: flex; flex-direction: column;
-  gap: 18px;
+  gap: 40px;
   width: 100%;
   max-width: 940px;
 }
 .bullet {
-  display: flex; align-items: center; gap: 28px;
-  padding: 20px 26px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  border-radius: 18px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  display: flex; align-items: center; gap: 32px;
+  padding: 10px 4px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
   font-family: "Be Vietnam Pro", sans-serif;
-  font-size: 38px; font-weight: 600;
-  color: var(--text, #fff);
-  line-height: 1.28;
+  font-size: 42px; font-weight: 800;
+  color: #ffffff;
+  line-height: 1.25;
+  letter-spacing: -0.3px;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.55);
   position: relative;
-  transition: background 0.35s ease, border-color 0.35s ease,
-              transform 0.35s ease;
+  transition: transform 0.35s ease, color 0.35s ease;
 }
-/* Icon box — small squircle holding a single emoji glyph. The emoji
-   sizes itself via font-size; box centres it. */
-.bullet-icon {
+/* The "#N" marker — bold gold sans, no chrome, just text. Slight
+   width floor so single-digit and double-digit markers don't shove the
+   text around. */
+.bullet-num {
   flex-shrink: 0;
-  width: 84px; height: 84px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.10);
-  display: flex; align-items: center; justify-content: center;
-  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
-               "Twemoji Mozilla", "Noto Sans Symbols 2", system-ui, sans-serif;
-  font-size: 48px;
+  min-width: 96px;
+  text-align: right;
+  font-family: "Be Vietnam Pro", "Inter Tight", "Inter", sans-serif;
+  font-size: 64px;
+  font-weight: 900;
   line-height: 1;
-  color: #fff;
-  text-align: center;
+  letter-spacing: -1px;
+  color: var(--gold, #fbbf24);
+  text-shadow: 0 4px 22px rgba(251, 191, 36, 0.35);
+  transition: transform 0.35s ease, color 0.35s ease,
+              text-shadow 0.35s ease;
 }
 .bullet-text {
   flex: 1;
@@ -439,16 +443,47 @@ html, body {
   overflow-wrap: break-word;
 }
 
-/* Karaoke active — gold accent border + bg lift. The icon doesn't change
-   colour (it carries content meaning, not theme state). */
-.bullet.bullet-active {
-  border-color: var(--gold, #fbbf24);
-  background: rgba(251, 191, 36, 0.10);
-  transform: translateX(6px);
+/* Focal beat — exactly 1 bullet in the scene. Centre everything,
+   beef the typography, give it the spotlight. */
+.bullet-list.bullet-count-1 {
+  gap: 0;
+  justify-content: center;
 }
-.bullet.bullet-active .bullet-icon {
-  background: rgba(251, 191, 36, 0.18);
-  border-color: rgba(251, 191, 36, 0.45);
+.bullet-list.bullet-count-1 .bullet {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 28px;
+  padding: 36px 32px;
+  font-size: 60px;
+  font-weight: 800;
+  line-height: 1.18;
+}
+.bullet-list.bullet-count-1 .bullet-num {
+  min-width: 0;
+  font-size: 120px;
+  letter-spacing: -3px;
+}
+
+/* Karaoke active — the marker pulses to bright gold and the row drifts
+   right slightly. No card flip, no bg wash — the contrast change is
+   the whole effect. For the focal-beat scene there's nothing to
+   "rotate" through, so the styling holds steady the entire scene. */
+.bullet.bullet-active {
+  transform: translateX(8px);
+  color: #ffffff;
+}
+.bullet.bullet-active .bullet-num {
+  color: #ffe066;
+  text-shadow: 0 0 28px rgba(255, 224, 102, 0.65),
+               0 4px 22px rgba(251, 191, 36, 0.5);
+  transform: scale(1.06);
+}
+.bullet-list.bullet-count-1 .bullet.bullet-active {
+  transform: scale(1.02);
+}
+.bullet-list.bullet-count-1 .bullet.bullet-active .bullet-num {
+  transform: scale(1.04);
 }
 
 /* ─── LAYOUT: Timeline ─── */

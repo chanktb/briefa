@@ -212,38 +212,37 @@ HeroCardWithLogo — Scene 1 ALTERNATIVE. Huge squircle logo + name + pill.
 BigStatCard — Spotlight ONE real number HUGE. (e.g. "134K sao" or "9.2K forks").
              USE ONLY when github_stats present. big_value must be the EXACT stars number
              (use display short "134K"). chips_grid = formats/topics list (4 or 8 items).
-BulletList — 3-5 short points. Best for "list of things", features, options.
-             **bullet_icons rule (CEO 2026-06-29)**: emit a parallel list of
-             emoji icons, ONE per bullet, length must match `bullets`. Each
-             emoji must MEAN the bullet — pick by semantic concept, not
-             decoration. Pick a single concrete emoji per bullet; do NOT
-             stack 2 emojis. Examples (anchor your choice on the IDEA, not
-             a literal word):
-               • "Khác biệt với chatbot thông thường" → 🔕 (or 🚫🤖)
-               • "Trí nhớ dài hạn vượt thời gian"     → ∞ (or 🧠 or ⏳)
-               • "Tự học thực tế thành kỹ năng"        → 📖 (or 🎓 or 🛠️)
-               • "Tự động hoá toàn diện"               → ⚙️ (or 🤖)
-               • "An toàn / kiểm soát chặt"            → 🛡️ (or 🔒)
-               • "Tốc độ / real-time"                  → ⚡ (or 🚀)
-               • "Phân tích dữ liệu"                   → 📊 (or 🔍)
-               • "Lập kế hoạch"                        → 🗺️ (or 📅)
-               • "Tăng trưởng / scale"                 → 📈 (or 🚀)
-               • "Tích hợp / kết nối"                  → 🔗 (or 🧩)
-             If you truly can't match an idea, fall back to a generic
-             pointer like ▸ or • for that ONE bullet (don't fall back for
-             ALL of them — every bullet should still earn a unique icon
-             whenever possible).
+BulletList — 1-4 short points. Marker rendered as ``#1``, ``#2`` etc.
+             **bullet count rule (CEO 2026-06-29 v3)**:
+             - If the topic has 3-4 balanced points → ONE BulletList scene
+               with all 3-4 bullets. The karaoke highlight rotates.
+             - If the topic has > 4 distinct points worth spotlighting →
+               EMIT MULTIPLE BulletList scenes, each containing exactly
+               ONE bullet (`bullets` length = 1). The scene becomes a
+               focal-point beat — one idea, one screen, one voice line.
+               The bullet stays highlighted for the whole scene.
+               Use this when each point deserves its own moment (e.g.
+               a 5-7 capability deep-dive of a repo).
+             - `bullet_icons` is DEPRECATED (kept for back-compat). Leave
+               as default empty list — the renderer no longer paints it.
              **CRITICAL voice_script rule for BulletList**:
-             - Structure: <1 intro sentence> + <1 sentence per bullet, in order> + <optional 1 outro>.
-             - Total sentences = N+1 (N = number of bullets) or N+2 if outro.
-             - Each bullet sentence MUST mention the bullet's key keyword/concept so viewer
-               associates voice with on-screen bullet. NO summarizing, NO skipping bullets.
-             - Bot automatically karaoke-highlights bullets in sync with voice timing — voice MUST
-               address bullets in same order as bullets array.
-             - Example: bullets=["A/B test tiêu đề", "Refine audience", "Scale theo ROAS"]
-               bullet_icons=["🧪", "🎯", "📈"]
+             - Multi-bullet scene (N ≥ 2): voice_script has N+1 sentences
+               (1 intro + 1 per bullet, in order), or N+2 with outro.
+               Each sentence mentions the bullet's key keyword.
+             - Single-bullet scene (N = 1): voice_script is 1-2 sentences
+               that fully expand on that single point (this is the
+               focal beat — don't waste it on intro/outro filler).
+             - Bot karaoke-highlights bullets in voice timing order —
+               voice MUST address bullets in same order as the array.
+             - Multi-bullet example:
+               bullets=["A/B test tiêu đề", "Refine audience", "Scale theo ROAS"]
                voice_script="Có 3 chiến lược tối ưu Google Ads. Đầu tiên, A/B test tiêu đề tăng CTR rõ rệt.
                Tiếp theo, refine audience giúp giảm CPA. Cuối cùng, scale budget khi đạt target ROAS."
+             - Single-bullet example (scene 4 of a 6-capability deep-dive):
+               bullets=["Trí nhớ dài hạn vượt phiên"]
+               voice_script="Trí nhớ dài hạn là điểm khác biệt — Hermes lưu state qua nhiều phiên,
+               không reset như chatbot. Cụ thể, mỗi cuộc trò chuyện thêm vào vector store thay vì
+               ghi đè."
 KPIGrid    — 2-4 metric cards. Best for stats, comparisons, key numbers, attributes.
              If no real numbers → use emoji as `value`. Prefer 2 or 4 items (not 3).
 Timeline   — 3-5 sequential steps with labels. Best for processes, roadmaps, history.

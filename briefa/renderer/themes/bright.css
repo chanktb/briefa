@@ -427,44 +427,42 @@ html, body {
 }
 
 /* ─── LAYOUT: BulletList ─── */
-/* ─── LAYOUT: BulletList — icon-card redesign (CEO 2026-06-29 v3) ───
-   Mirrors dark.css's icon-card structure (squircle icon box + emoji from
-   planner.bullet_icons) but with dark text + darker chrome for the cream
-   bg. */
+/* ─── LAYOUT: BulletList — #N marker redesign (CEO 2026-06-29 v4) ───
+   Bright variant: dark text + red marker (newspaper feel) for the
+   cream bg. Layout structure mirrors dark.css. */
 .bullet-list {
   display: flex; flex-direction: column;
-  gap: 18px;
+  gap: 40px;
   width: 100%;
   max-width: 940px;
 }
 .bullet {
-  display: flex; align-items: center; gap: 28px;
-  padding: 20px 26px;
-  background: rgba(15, 23, 42, 0.04);
-  border: 1px solid rgba(15, 23, 42, 0.10);
-  border-radius: 18px;
-  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
+  display: flex; align-items: center; gap: 32px;
+  padding: 10px 4px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
   font-family: var(--body);
-  font-size: 38px; font-weight: 600;
+  font-size: 42px; font-weight: 800;
   color: var(--text);
-  line-height: 1.28;
+  line-height: 1.25;
+  letter-spacing: -0.3px;
   position: relative;
-  transition: background 0.35s ease, border-color 0.35s ease,
-              transform 0.35s ease;
+  transition: transform 0.35s ease, color 0.35s ease;
 }
-.bullet-icon {
+.bullet-num {
   flex-shrink: 0;
-  width: 84px; height: 84px;
-  border-radius: 20px;
-  background: rgba(15, 23, 42, 0.07);
-  border: 1px solid rgba(15, 23, 42, 0.10);
-  display: flex; align-items: center; justify-content: center;
-  font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji",
-               "Twemoji Mozilla", "Noto Sans Symbols 2", system-ui, sans-serif;
-  font-size: 48px;
+  min-width: 96px;
+  text-align: right;
+  font-family: var(--sans);
+  font-size: 64px;
+  font-weight: 900;
   line-height: 1;
-  color: var(--text);
-  text-align: center;
+  letter-spacing: -1px;
+  color: var(--pink-hot);
+  text-shadow: 0 4px 18px rgba(220, 38, 38, 0.18);
+  transition: transform 0.35s ease, color 0.35s ease;
 }
 .bullet-text {
   flex: 1;
@@ -472,15 +470,39 @@ html, body {
   overflow-wrap: break-word;
 }
 
-/* Karaoke active — newspaper highlight: gold accent border + warm tint. */
-.bullet.bullet-active {
-  border-color: var(--gold);
-  background: var(--highlight-bg);
-  transform: translateX(6px);
+/* Focal beat — 1 bullet centred + scaled up. */
+.bullet-list.bullet-count-1 {
+  gap: 0;
+  justify-content: center;
 }
-.bullet.bullet-active .bullet-icon {
-  background: rgba(180, 83, 9, 0.10);
-  border-color: rgba(180, 83, 9, 0.30);
+.bullet-list.bullet-count-1 .bullet {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 28px;
+  padding: 36px 32px;
+  font-size: 60px;
+  font-weight: 800;
+  line-height: 1.18;
+}
+.bullet-list.bullet-count-1 .bullet-num {
+  min-width: 0;
+  font-size: 120px;
+  letter-spacing: -3px;
+}
+
+.bullet.bullet-active {
+  transform: translateX(8px);
+}
+.bullet.bullet-active .bullet-num {
+  color: var(--gold);
+  transform: scale(1.06);
+}
+.bullet-list.bullet-count-1 .bullet.bullet-active {
+  transform: scale(1.02);
+}
+.bullet-list.bullet-count-1 .bullet.bullet-active .bullet-num {
+  transform: scale(1.04);
 }
 
 /* ─── LAYOUT: Timeline ─── */

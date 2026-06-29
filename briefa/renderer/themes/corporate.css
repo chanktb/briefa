@@ -226,19 +226,19 @@ html, body {
 }
 .big-stat-unit { color: var(--pink-hot); }   /* amber */
 
-/* ──────────────────── Bullets — icon-card redesign (CEO 2026-06-29 v3) ────────────────────
- * Inherits dark.css's icon-card structure verbatim (squircle icon box +
- * emoji from planner.bullet_icons). Only re-tints the karaoke-active row
- * with corporate cyan so it stays consistent with the cyan accent palette.
+/* ──────────────────── Bullets — #N marker redesign (CEO 2026-06-29 v4) ────────────────────
+ * Inherits dark.css's #N structure verbatim. Corporate-specific: marker
+ * uses the corporate cyan instead of gold so the row reads as part of
+ * the cyan accent palette (navy bg). Active marker brightens further.
  */
-.bullet.bullet-active {
-  border-color: rgba(0, 212, 255, 0.60);
-  background: rgba(0, 212, 255, 0.08);
-  transform: translateX(6px);
+.bullet-num {
+  color: var(--teal, #00d4ff);
+  text-shadow: 0 4px 22px rgba(0, 212, 255, 0.35);
 }
-.bullet.bullet-active .bullet-icon {
-  background: rgba(0, 212, 255, 0.12);
-  border-color: rgba(0, 212, 255, 0.45);
+.bullet.bullet-active .bullet-num {
+  color: #80e9ff;
+  text-shadow: 0 0 28px rgba(0, 212, 255, 0.65),
+               0 4px 22px rgba(0, 212, 255, 0.5);
 }
 
 /* ──────────────────── Chips & tags ──────────────────── */
