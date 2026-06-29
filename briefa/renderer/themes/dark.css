@@ -232,14 +232,16 @@ html, body {
   gap: 32px;
   overflow: hidden;
 }
-/* v31: BulletList với 5 bullet (×2 dòng) hay overflow scene zone. justify center sẽ
-   clip ĐỀU top+bottom → title bị cắt khỏi vùng nhìn ("đẩy lên cao").
-   Anchor TOP để clip chỉ ở bottom (last bullet) — chấp nhận hơn vì viewer thường
-   đọc bullets từ trên xuống. */
+/* CEO 2026-06-29: was anchor-top (justify-content: flex-start) to protect
+   the 5-bullet ×2-line overflow case. Now that scene zone is 1160px (was
+   840) and the editorial bullet style is taller-per-row but only 5 max,
+   centering wins — short lists no longer hug the top with empty space
+   below them. If overflow returns on extreme cases, swap back to
+   flex-start. */
 .scene:has(.bullet-list) {
-  justify-content: flex-start;
-  gap: 22px;
-  padding-top: 4px;
+  justify-content: center;
+  gap: 28px;
+  padding-top: 0;
 }
 .scene-title {
   font-family: "Be Vietnam Pro", sans-serif;
@@ -386,58 +388,81 @@ html, body {
   color: var(--text-soft);
 }
 
-/* ─── LAYOUT: BulletList ─── */
-/* CEO 2026-06-29: gap 14 → 24 — bullets no longer cramped against each
-   other now that scene takes back the transcript space (bottom 700 → 380),
-   ~1160px of vertical room for ≤5 bullets. */
+/* ─── LAYOUT: BulletList — editorial redesign (CEO 2026-06-29) ───
+   Old style was a uniform row of white pills with a small numbered badge
+   inside — clean, but read as "list of cards" and clustered visually.
+   New style drops the card chrome entirely: huge gradient numeral on the
+   left, hairline divider between rows, generous breathing room. Reads
+   like a magazine list-rule instead of a UI control. Vertical centering
+   is now safe because the freed transcript space (scene-bottom 700→380)
+   gives ~1160px of room, comfortably fitting 5 rows of the bigger style. */
 .bullet-list {
   display: flex; flex-direction: column;
-  gap: 24px;
+  gap: 36px;
   width: 100%;
-  max-width: 920px;
+  max-width: 940px;
 }
+/* Row: no card chrome — number + separator + text. Padding-bottom holds
+   the hairline divider. */
 .bullet {
-  display: flex; align-items: center; gap: 22px;
-  padding: 18px 28px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 22px;
-  box-shadow: 0 4px 20px var(--card-glow);
-  backdrop-filter: blur(10px);
+  display: flex; align-items: center; gap: 30px;
+  padding: 6px 4px 22px 4px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
   font-family: "Be Vietnam Pro", sans-serif;
-  font-size: 34px; font-weight: 700;
-  color: #fff;
-  line-height: 1.2;
-  transition: all 0.4s cubic-bezier(0.34, 1.4, 0.64, 1);
+  font-size: 40px; font-weight: 700;
+  color: var(--text, #fff);
+  line-height: 1.25;
+  position: relative;
+  transition: transform 0.4s cubic-bezier(0.34, 1.4, 0.64, 1);
 }
+/* Hairline divider between rows. Last row keeps the rhythm without one. */
+.bullet:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -18px;
+  height: 1px;
+  background: var(--card-border, rgba(255,255,255,0.18));
+  opacity: 0.55;
+}
+/* Number is the visual hero — big bold gold gradient text, no badge. The
+   vertical bar to its right acts as the column-rule separator. */
 .bullet-num {
   flex-shrink: 0;
-  width: 58px; height: 58px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, var(--teal), var(--cyan-glow));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 26px; font-weight: 900;
-  color: #0a0e1a;
-  box-shadow: 0 6px 20px rgba(34,211,238,0.4);
-  transition: all 0.4s cubic-bezier(0.34, 1.4, 0.64, 1);
+  width: auto; min-width: 92px; height: auto;
+  border: none;
+  border-right: 4px solid var(--teal, #22d3ee);
+  border-radius: 0;
+  background: linear-gradient(135deg, var(--gold, #fbbf24), var(--pink-hot, #ef4444));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  padding: 0 22px 0 0;
+  font-family: "Be Vietnam Pro", "Inter Tight", "Inter", sans-serif;
+  font-size: 76px; font-weight: 900;
+  line-height: 1;
+  letter-spacing: -2px;
+  text-align: right;
+  box-shadow: none;
+  transition: transform 0.4s cubic-bezier(0.34, 1.4, 0.64, 1),
+              filter 0.4s ease;
 }
 
-/* v30 karaoke active bullet — chỉ đổi MÀU NỀN khi đọc tới, KHÔNG zoom/translate.
-   Background gradient saturated hơn (0.20→0.55) để không nhìn mờ. */
+/* Karaoke active — slide the row right, super-charge the number's glow.
+   No bg change because there's no card to recolour. */
 .bullet.bullet-active {
-  border-color: var(--gold);
-  background: linear-gradient(135deg, rgba(251,191,36,0.55) 0%, rgba(239,68,68,0.35) 100%);
-  box-shadow:
-    0 8px 36px rgba(251, 191, 36, 0.5),
-    0 0 0 2px rgba(251, 191, 36, 0.4);
-  color: #fff;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  transform: translateX(8px);
+  color: var(--text, #fff);
 }
 .bullet.bullet-active .bullet-num {
-  background: linear-gradient(135deg, var(--gold) 0%, var(--pink-hot) 100%);
-  color: #fff;
-  box-shadow:
-    0 8px 28px rgba(239, 68, 68, 0.6),
-    0 0 24px rgba(251, 191, 36, 0.5);
+  filter: drop-shadow(0 0 28px rgba(251, 191, 36, 0.65));
+  transform: scale(1.06);
 }
 
 /* ─── LAYOUT: Timeline ─── */

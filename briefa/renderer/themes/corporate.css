@@ -226,42 +226,63 @@ html, body {
 }
 .big-stat-unit { color: var(--pink-hot); }   /* amber */
 
-/* ──────────────────── Bullets — white cards w/ accent bar ──────────────────── */
-/* Same rhythm as bright but with the corporate palette: cyan / amber /
- * sky / mint instead of red / navy / amber / teal. */
-.bullet {
-  background: var(--card-bg);
-  border: none;
-  border-left: 5px solid var(--teal);
-  color: var(--card-text);
-  font-weight: 600;
-  box-shadow: var(--card-shadow);
+/* ──────────────────── Bullets — editorial redesign (CEO 2026-06-29) ────────────────────
+ * Was white pill cards with a coloured number badge inside. The redesign
+ * inherits dark.css's editorial row (no card, big gradient number,
+ * hairline divider) and only overrides the four per-bullet number
+ * gradients so the cyan / amber / sky / mint corporate palette still
+ * rotates row-by-row instead of looking monochrome.
+ *
+ * Number text stays gradient-clipped to one of the four palette
+ * accents; the column-rule bar to its right matches.
+ */
+.bullet { color: #ffffff; }
+.bullet:not(:last-child)::after {
+  background: rgba(255, 255, 255, 0.22);
 }
-.bullet-num {
-  background: var(--teal);
-  /* DARK text on bright accent — white on cyan would only pass at 1.77:1.
-   * Dark on cyan = 11.84:1, and the same dark text reads on amber/sky/mint
-   * via the rotation below (all ≥ 8.8:1). */
-  color: #0f172a;
-  box-shadow: 0 4px 14px rgba(0, 212, 255, 0.30);
-  font-weight: 900;
+.bullet:nth-child(4n+1) .bullet-num {
+  background: linear-gradient(135deg, var(--bullet-c1), color-mix(in srgb, var(--bullet-c1) 55%, white));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  border-right-color: var(--bullet-c1);
+}
+.bullet:nth-child(4n+2) .bullet-num {
+  background: linear-gradient(135deg, var(--bullet-c2), color-mix(in srgb, var(--bullet-c2) 55%, white));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  border-right-color: var(--bullet-c2);
+}
+.bullet:nth-child(4n+3) .bullet-num {
+  background: linear-gradient(135deg, var(--bullet-c3), color-mix(in srgb, var(--bullet-c3) 55%, white));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  border-right-color: var(--bullet-c3);
+}
+.bullet:nth-child(4n+4) .bullet-num {
+  background: linear-gradient(135deg, var(--bullet-c4), color-mix(in srgb, var(--bullet-c4) 55%, white));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  border-right-color: var(--bullet-c4);
 }
 
-.bullet:nth-child(4n+1) { border-left-color: var(--bullet-c1); }
-.bullet:nth-child(4n+2) { border-left-color: var(--bullet-c2); }
-.bullet:nth-child(4n+3) { border-left-color: var(--bullet-c3); }
-.bullet:nth-child(4n+4) { border-left-color: var(--bullet-c4); }
-.bullet:nth-child(4n+1) .bullet-num { background: var(--bullet-c1); box-shadow: 0 4px 14px color-mix(in srgb, var(--bullet-c1) 60%, transparent); }
-.bullet:nth-child(4n+2) .bullet-num { background: var(--bullet-c2); box-shadow: 0 4px 14px color-mix(in srgb, var(--bullet-c2) 60%, transparent); }
-.bullet:nth-child(4n+3) .bullet-num { background: var(--bullet-c3); box-shadow: 0 4px 14px color-mix(in srgb, var(--bullet-c3) 60%, transparent); }
-.bullet:nth-child(4n+4) .bullet-num { background: var(--bullet-c4); box-shadow: 0 4px 14px color-mix(in srgb, var(--bullet-c4) 60%, transparent); }
-
-/* Karaoke active — pale cyan glow, no rotation (corporate stays still). */
+/* Karaoke active — calm + corporate: just brighten the number, no slide. */
 .bullet.bullet-active {
-  background: var(--card-bg);
-  color: var(--card-text);
-  transform: scale(1.02);
-  box-shadow: 0 12px 36px rgba(0, 212, 255, 0.30);
+  background: transparent;
+  color: #ffffff;
+  transform: none;
+  box-shadow: none;
+}
+.bullet.bullet-active .bullet-num {
+  filter: drop-shadow(0 0 28px rgba(0, 212, 255, 0.55));
+  transform: scale(1.04);
 }
 
 /* ──────────────────── Chips & tags ──────────────────── */

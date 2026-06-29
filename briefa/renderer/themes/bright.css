@@ -427,54 +427,68 @@ html, body {
 }
 
 /* ─── LAYOUT: BulletList ─── */
-/* v31: shrink padding/font để 5 bullets fit trong scene zone 840px */
-/* CEO 2026-06-29: gap 14 → 24 — more breathing now that transcript ticker
-   no longer steals the bottom band. */
+/* ─── LAYOUT: BulletList — editorial redesign (CEO 2026-06-29) ───
+   Bright variant of the new editorial bullet (no card, big number + hairline).
+   Numbers stay in the brand red so the newspaper attitude is preserved,
+   text/hairline switch to dark-on-light for contrast on the white bg. */
 .bullet-list {
   display: flex; flex-direction: column;
-  gap: 24px;
+  gap: 36px;
   width: 100%;
-  max-width: 920px;
+  max-width: 940px;
 }
-/* v0.5: white card + red left border + dark text — newspaper card */
 .bullet {
-  display: flex; align-items: center; gap: 20px;
-  padding: 20px 26px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-left: 5px solid var(--pink-hot);
-  border-radius: 8px;
-  box-shadow: var(--card-shadow);
+  display: flex; align-items: center; gap: 30px;
+  padding: 6px 4px 22px 4px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
   font-family: var(--body);
-  font-size: 34px; font-weight: 600;
+  font-size: 40px; font-weight: 700;
   color: var(--text);
   line-height: 1.25;
-  transition: all 0.4s cubic-bezier(0.34, 1.4, 0.64, 1);
+  position: relative;
+  transition: transform 0.4s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+.bullet:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: -18px;
+  height: 1px;
+  background: rgba(15, 23, 42, 0.16);
 }
 .bullet-num {
   flex-shrink: 0;
-  width: 56px; height: 56px;
-  border-radius: 50%;
-  background: var(--pink-hot);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 26px; font-weight: 900;
-  color: #fff;
-  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3);
-  transition: all 0.4s cubic-bezier(0.34, 1.4, 0.64, 1);
+  width: auto; min-width: 92px; height: auto;
+  border: none;
+  border-right: 4px solid var(--pink-hot);
+  border-radius: 0;
+  background: linear-gradient(135deg, var(--pink-hot), var(--gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  padding: 0 22px 0 0;
   font-family: var(--sans);
+  font-size: 76px; font-weight: 900;
+  line-height: 1;
+  letter-spacing: -2px;
+  text-align: right;
+  box-shadow: none;
+  transition: transform 0.4s cubic-bezier(0.34, 1.4, 0.64, 1),
+              filter 0.4s ease;
 }
 
-/* v0.5 karaoke active bullet — light yellow background highlight */
+/* Karaoke active — newspaper highlight: gold accent on the number side. */
 .bullet.bullet-active {
-  border-left-color: var(--gold);
-  background: var(--highlight-bg);
-  box-shadow: 0 6px 24px rgba(180, 83, 9, 0.18);
+  background: transparent;
   color: var(--text);
+  transform: translateX(8px);
 }
 .bullet.bullet-active .bullet-num {
-  background: var(--gold);
-  color: #fff;
-  box-shadow: 0 4px 14px rgba(180, 83, 9, 0.4);
+  filter: drop-shadow(0 0 22px rgba(180, 83, 9, 0.35));
+  transform: scale(1.06);
 }
 
 /* ─── LAYOUT: Timeline ─── */

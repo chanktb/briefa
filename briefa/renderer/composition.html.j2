@@ -82,6 +82,13 @@
        never paints. To bring it back, drop this rule (or set `display:
        block`) without removing the `<div id="subtitle">` block. */
     #subtitle { display: none !important; }
+
+    /* Channel @handle hidden in the profile chip (CEO 2026-06-29). The
+       chip-name alone reads as the brand mark; the handle/slug duplicates
+       the FB-page URL and visually crowds the chip. The DOM stays so the
+       template-side ``{% if channel.channel_handle %}`` guard keeps
+       working for any future variant that wants it back. */
+    .chip-handle { display: none !important; }
     .citation-chip .citation-domain {
       font-weight: 400;
       opacity: 0.68;
