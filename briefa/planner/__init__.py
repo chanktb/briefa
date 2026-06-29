@@ -1,0 +1,118 @@
+"""Scene planning via Gemini — input source → structured ScenePlan."""
+
+from .content_types import (
+    DEFAULT_VOICE_NAME,
+    DEFAULT_VOICE_NAME_MALE,
+    GOOGLE_TTS_DEFAULT_FEMALE,
+    GOOGLE_TTS_DEFAULT_MALE,
+    GOOGLE_TTS_POOL_FEMALE,
+    GOOGLE_TTS_POOL_MALE,
+    GOOGLE_TTS_VOICE_BY_TYPE,
+    VOICE_NAME_BY_TYPE,
+    VOICE_RATE_BY_TYPE,
+    VOICE_RATE_MAP,
+    ContentType,
+)
+from .gemini_client import (
+    DEFAULT_MODEL,
+    ENRICH_MODEL,
+    EXTRACT_MODEL,
+    LOW_CONTENT_DOMAINS,
+    MAX_ATTEMPTS,
+    get_client,
+    needs_enrich,
+    parse_json_loose,
+    plan_scenes,
+    stage1_extract,
+    stage2_enrich,
+)
+from .prompts import (
+    ENRICH_SYSTEM_PROMPT,
+    EXTRACT_SYSTEM_PROMPT,
+    SYSTEM_PROMPT,
+    build_meta_block,
+    build_repair_prompt,
+)
+from .scene_models import (
+    LAYOUT_DURATIONS,
+    LAYOUT_SLOTS_MODEL,
+    BigStatCardSlots,
+    BulletListSlots,
+    CTAOutroSlots,
+    HeroCardWithLogoSlots,
+    KPIGridSlots,
+    KPIItem,
+    LayoutId,
+    Scene,
+    ScenePlan,
+    ScreenshotEmbedSlots,
+    SlotsUnion,
+    TerminalWindowSlots,
+    TimelineSlots,
+    TimelineStep,
+    TitleHeroSlots,
+)
+from .voice_policy import (
+    FEMALE_TOPIC_KEYWORDS,
+    VALID_POLICIES,
+    apply_voice_gender_policy,
+    detect_female_topic,
+)
+
+__all__ = [
+    # planning entry point
+    "plan_scenes",
+    "get_client",
+    # stage hooks
+    "stage1_extract",
+    "stage2_enrich",
+    "needs_enrich",
+    "parse_json_loose",
+    # prompts
+    "SYSTEM_PROMPT",
+    "EXTRACT_SYSTEM_PROMPT",
+    "ENRICH_SYSTEM_PROMPT",
+    "build_meta_block",
+    "build_repair_prompt",
+    # config
+    "DEFAULT_MODEL",
+    "EXTRACT_MODEL",
+    "ENRICH_MODEL",
+    "MAX_ATTEMPTS",
+    "LOW_CONTENT_DOMAINS",
+    # models
+    "ContentType",
+    "LayoutId",
+    "Scene",
+    "ScenePlan",
+    "TitleHeroSlots",
+    "BulletListSlots",
+    "KPIItem",
+    "KPIGridSlots",
+    "TimelineStep",
+    "TimelineSlots",
+    "CTAOutroSlots",
+    "HeroCardWithLogoSlots",
+    "BigStatCardSlots",
+    "TerminalWindowSlots",
+    "ScreenshotEmbedSlots",
+    "SlotsUnion",
+    "LAYOUT_DURATIONS",
+    "LAYOUT_SLOTS_MODEL",
+    # voice policy
+    "FEMALE_TOPIC_KEYWORDS",
+    "VALID_POLICIES",
+    "apply_voice_gender_policy",
+    "detect_female_topic",
+    # voice config
+    "VOICE_RATE_MAP",
+    "VOICE_RATE_BY_TYPE",
+    "VOICE_NAME_BY_TYPE",
+    "DEFAULT_VOICE_NAME",
+    "DEFAULT_VOICE_NAME_MALE",
+    "GOOGLE_TTS_DEFAULT_MALE",
+    "GOOGLE_TTS_DEFAULT_FEMALE",
+    "GOOGLE_TTS_VOICE_BY_TYPE",
+    "GOOGLE_TTS_POOL_MALE",
+    "GOOGLE_TTS_POOL_FEMALE",
+]

@@ -1,0 +1,53 @@
+# Secrets
+.env
+.env.local
+*.env.local
+channels/*/.env.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+*.egg-info/
+*.egg
+.eggs/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Briefa runtime artifacts
+output/
+jobs/
+.tts_cache/
+*.mp4
+*.mp3
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local docs scratch
+SCRATCH.md
+TODO.local.md
+
+# Private build notes (kept local, never published — match Tella convention)
+CLAUDE_CONTEXT.md
+STATE.md
+DECISIONS.md
+BRIEF.md
+SESSIONS/

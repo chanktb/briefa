@@ -1,0 +1,18 @@
+<div id="scene-{{ scene.scene_index }}" class="scene clip"
+     data-start="{{ '%.2f'|format(scene.start) }}"
+     data-duration="{{ '%.2f'|format(scene.duration) }}"
+     data-track-index="3">
+  <div class="scene-title" id="scene-{{ scene.scene_index }}-title">
+    {{ scene.slots.section_title | highlight(scene.slots.highlight_word) }}
+  </div>
+  <div class="kpi-grid{% if scene.slots.items|length == 2 %} kpi-grid-2{% endif %}"
+       id="scene-{{ scene.scene_index }}-grid">
+    {% for item in scene.slots.items %}
+    <div class="kpi-card" id="scene-{{ scene.scene_index }}-card-{{ loop.index }}">
+      <div class="kpi-value" id="scene-{{ scene.scene_index }}-value-{{ loop.index }}">{{ item.value }}{% if item.unit %}<span class="kpi-unit">{{ item.unit }}</span>{% endif %}</div>
+      <div class="kpi-label" id="scene-{{ scene.scene_index }}-label-{{ loop.index }}">{{ item.label }}</div>
+      {% if item.sub %}<div class="kpi-sub" id="scene-{{ scene.scene_index }}-sub-{{ loop.index }}">{{ item.sub }}</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>

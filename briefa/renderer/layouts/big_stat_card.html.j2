@@ -1,0 +1,26 @@
+{# BigStatCard — escbase-style: LEFT name+delta · RIGHT huge number #}
+<div id="scene-{{ scene.scene_index }}" class="scene clip"
+     data-start="{{ '%.2f'|format(scene.start) }}"
+     data-duration="{{ '%.2f'|format(scene.duration) }}"
+     data-track-index="3">
+  <div id="scene-{{ scene.scene_index }}-card" class="big-stat-card">
+    <div id="scene-{{ scene.scene_index }}-left" class="big-stat-left">
+      <div id="scene-{{ scene.scene_index }}-nametop" class="big-stat-name-top">{{ scene.slots.name_top }}</div>
+      <div id="scene-{{ scene.scene_index }}-namemain" class="big-stat-name-main">{{ scene.slots.name_main }}</div>
+      {% if scene.slots.delta_text %}
+      <div id="scene-{{ scene.scene_index }}-delta" class="big-stat-delta">{{ scene.slots.delta_text }}</div>
+      {% endif %}
+    </div>
+    <div id="scene-{{ scene.scene_index }}-right" class="big-stat-right">
+      <div id="scene-{{ scene.scene_index }}-bigvalue" class="big-stat-value">{{ scene.slots.big_value }}</div>
+      <div id="scene-{{ scene.scene_index }}-bigunit" class="big-stat-unit">{{ scene.slots.big_unit }}</div>
+    </div>
+  </div>
+  {% if scene.slots.chips_grid %}
+  <div id="scene-{{ scene.scene_index }}-grid" class="chips-grid">
+    {% for chip in scene.slots.chips_grid %}
+    <span id="scene-{{ scene.scene_index }}-chip-{{ loop.index }}" class="chip-pill">{{ chip }}</span>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>

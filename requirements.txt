@@ -1,0 +1,25 @@
+# Core
+pydantic>=2.6
+python-dotenv>=1.0
+mutagen>=1.47
+
+# Source fetching (HTML + JSON)
+httpx>=0.27
+beautifulsoup4>=4.12
+lxml>=5.2
+
+# Gemini planner + vision
+google-genai>=0.3
+
+# TTS — Edge primary, gTTS final fallback. ElevenLabs / Google Chirp 3 HD
+# are opt-in providers used when their keys are set in channel.env.
+#
+# Pinned >=7.0 — Microsoft updated the Bing speech endpoint in 2026 and
+# the 6.1.x line now hits WSServerHandshakeError 403 on every call. The
+# upstream "pin <7" rule from ktb-studio is stale; lingo-feeder runs on
+# 7.2.x in production with no issues. See MEMORY.md 2026-06-10.
+edge-tts>=7.0
+gTTS>=2.5
+
+# Template renderer (HyperFrames composition.html.j2)
+jinja2>=3.1

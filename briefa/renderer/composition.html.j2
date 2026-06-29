@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1080, height=1920" />
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+  {% set theme_variant = channel.theme_variant or 'dark' %}
+  <link
+    {% if theme_variant == 'bright' %}
+    href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400;1,9..144,600&display=swap"
+    {% elif theme_variant == 'vivid' %}
+    href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800;900&family=Poppins:wght@500;600;700;800;900&family=Inter:wght@500;600;700;800;900&display=swap"
+    {% elif theme_variant == 'corporate' %}
+    href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&family=Inter+Tight:wght@500;600;700;800;900&display=swap"
+    {% else %}
+    href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap"
+    {% endif %}
+    rel="stylesheet"
+  />
+  <style>
+    /* Emoji glyph fallback comes from the system: the VPS / local
+       machine has `fonts-noto-color-emoji` installed (apt / dnf
+       package) and Chrome uses it as the OS-level fallback whenever a
+       brand font has no glyph for an emoji codepoint. CSS doesn't need
+       any extra declaration — Chrome's font matcher handles per-glyph
+       substitution itself once the system font is available. */
+    {% include 'themes/' + theme_variant + '.css' %}
+
+    /* ────────────────────────────────────────────────────────────────
+       Briefa citation chip (per-scene source attribution overlay)
+       Bottom-left, inside the 9:16 safe-zone (x≥90, y≤1635).
+       For 16:9 the renderer scales the same chip to the wider canvas.
+       ──────────────────────────────────────────────────────────────── */
+    .citation-chip {
+      position: absolute;
+      left: 90px;
+      bottom: 300px;            /* 285 px safe-zone + 15 px breath  */
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: rgba(15, 17, 22, 0.74);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+      font-family: var(--font-sans, "Inter", system-ui, sans-serif);
+      font-size: 24px;
+      line-height: 1.0;
+      color: rgba(255, 255, 255, 0.95);
+      max-width: 820px;          /* leave 90 px right clearance */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      z-index: 80;
+    }
+    .citation-chip::before {
+      content: "↳";              /* simple provenance glyph */
+      display: inline-block;
+      font-weight: 600;
+      opacity: 0.7;
+    }
+    .citation-chip .citation-source {
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+    .citation-chip .citation-domain {
+      font-weight: 400;
+      opacity: 0.68;
+      font-size: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"
+       data-composition-id="main"
+       data-start="0"
+       data-duration="{{ '%.2f'|format(total_duration) }}"
+       data-width="1080"
+       data-height="1920">
+
+    {# ═══════════════ PERSISTENT LAYERS (each on its own track) ═══════════════ #}
+    <div id="bg" class="clip"
+         data-start="0"
+         data-duration="{{ '%.2f'|format(total_duration) }}"
+         data-track-index="0">
+      <div class="starfield"></div>
+      <div class="grain"></div>
+      <div class="vignette"></div>
+    </div>
+
+    <div id="profile-chip" class="clip"
+         data-start="0"
+         data-duration="{{ '%.2f'|format(total_duration) }}"
+         data-track-index="2">
+      {% if channel.avatar_filename %}
+      <img class="chip-avatar" src="static/{{ channel.avatar_filename }}" alt="" />
+      {% else %}
+      <span class="chip-dot"></span>
+      {% endif %}
+      <div class="chip-info">
+        <div class="chip-name">{{ channel.channel_name }}</div>
+        {% if channel.channel_handle %}
+        <div class="chip-handle">{{ channel.channel_handle }}</div>
+        {% endif %}
+      </div>
+    </div>
+
+    {# CEO 2026-06-17 bug #2: source attribution shown in BOTH the top
+       #source-badge ("NGUỒN domain.com") and the per-scene #citation-chip
+       (bottom "↳ Source · domain.com") is redundant. Keep only the
+       per-scene citation chip — it carries the same domain plus accurate
+       per-input source name when there are multiple inputs. Source-badge
+       removed; if we ever want it back, the {% if source_domain %} hook
+       comes back here. #}
+
+    <div id="subtitle" class="clip"
+         data-start="0"
+         data-duration="{{ '%.2f'|format(total_duration) }}"
+         data-track-index="4">
+      <div class="sub-text" id="sub-text"></div>
+    </div>
+
+    {# ═══════════════ SCENES (data-driven, layout-specific) ═══════════════ #}
+    {% for scene in scenes %}
+    {% include 'layouts/' ~ scene.layout_filename %}
+    {% endfor %}
+
+    {# ═══════════════ CITATION CHIPS (Briefa per-scene attribution) ═══════════════ #}
+    {% for scene in scenes %}{% if scene.citation_name or scene.citation_domain %}
+    {# CEO 2026-06-17 bug #2: only domain.com needed — drop the "Source ·"
+       label part. When domain is present we show domain alone; when only
+       a free-form citation_name (text input, no URL) we fall back to it. #}
+    <div class="citation-chip clip"
+         data-start="{{ '%.2f'|format(scene.start) }}"
+         data-duration="{{ '%.2f'|format(scene.duration) }}"
+         data-track-index="{{ 80 + scene.scene_index }}">
+      <span class="citation-source">{{ scene.citation_domain or scene.citation_name }}</span>
+    </div>
+    {% endif %}{% endfor %}
+
+    {# ═══════════════ AUDIO (one <audio> per scene, sequential tracks) ═══════════════ #}
+    {% for scene in scenes %}
+    <audio id="voice-scene-{{ scene.scene_index }}" class="clip"
+           data-start="{{ '%.2f'|format(scene.start) }}"
+           data-duration="{{ '%.2f'|format(scene.audio_duration) }}"
+           data-track-index="{{ 4 + scene.scene_index }}"
+           data-volume="1.0"
+           src="assets/audio/scene_{{ scene.scene_index }}.mp3"></audio>
+    {% endfor %}
+    {% if promo_audio %}
+    {# v28 PROMO OUTRO: plays after last scene's voice ends. Last scene visually extended. #}
+    <audio id="voice-promo" class="clip"
+           data-start="{{ '%.2f'|format(promo_start) }}"
+           data-duration="{{ '%.2f'|format(promo_duration) }}"
+           data-track-index="200"
+           data-volume="1.0"
+           src="{{ promo_audio }}"></audio>
+    {% endif %}
+  </div>
+
+  <script>
+    /**
+     * autoFit — shrink text font-size so it fits inside its container.
+     * Walks down font-size by 2px until both width AND height fit (or hit minPx).
+     * Vietnamese diacritics need ~1.18 line-height; we tighten via CSS, not here.
+     */
+    function autoFit(el, minPx, maxIters) {
+      if (!el) return;
+      minPx = minPx || 18;
+      maxIters = maxIters || 60;
+      var parent = el.parentElement || el;
+      // For inline-block / block: scrollWidth > clientWidth → overflow.
+      // Also check scrollHeight > clientHeight for multi-line.
+      var fs = parseFloat(getComputedStyle(el).fontSize) || 32;
+      var iter = 0;
+      while (
+        (el.scrollWidth > el.clientWidth + 2 || el.scrollHeight > el.clientHeight + 2 ||
+         el.scrollWidth > parent.clientWidth + 2)
+        && fs > minPx
+        && iter < maxIters
+      ) {
+        fs -= 2;
+        el.style.fontSize = fs + "px";
+        iter++;
+      }
+    }
+
+    /**
+     * autoFitByCharCount — for elements where parent dimensions are unreliable
+     * (HF render before layout settles). Scale font-size down by char length.
+     */
+    function autoFitByCharCount(el, thresholds) {
+      if (!el) return;
+      var len = (el.textContent || "").trim().length;
+      var baseFs = parseFloat(getComputedStyle(el).fontSize) || 32;
+      var scale = 1;
+      for (var i = 0; i < thresholds.length; i++) {
+        if (len > thresholds[i].above) scale = thresholds[i].scale;
+      }
+      if (scale < 1) {
+        el.style.fontSize = Math.round(baseFs * scale) + "px";
+      }
+    }
+
+    // ─── Apply autoFit to all overflow-prone elements BEFORE GSAP starts ───
+    // Per-character thresholds (longer text → smaller font).
+    var FIT_RULES = [
+      { selector: ".hero-title",       thresholds: [{above: 14, scale: 0.88}, {above: 22, scale: 0.74}, {above: 32, scale: 0.60}] },
+      { selector: ".hero-logo-title",  thresholds: [{above: 14, scale: 0.88}, {above: 22, scale: 0.72}, {above: 32, scale: 0.58}] },
+      { selector: ".hero-subtitle",    thresholds: [{above: 30, scale: 0.85}, {above: 50, scale: 0.70}, {above: 70, scale: 0.58}] },
+      { selector: ".hero-logo-pill",   thresholds: [{above: 40, scale: 0.85}, {above: 60, scale: 0.72}] },
+      { selector: ".scene-title",      thresholds: [{above: 18, scale: 0.88}, {above: 28, scale: 0.72}, {above: 40, scale: 0.58}] },
+      { selector: ".bullet",           thresholds: [{above: 30, scale: 0.90}, {above: 45, scale: 0.78}, {above: 60, scale: 0.65}] },
+      { selector: ".kpi-value",        thresholds: [{above: 5, scale: 0.88},  {above: 8, scale: 0.72},  {above: 11, scale: 0.58}, {above: 14, scale: 0.46}] },
+      { selector: ".kpi-label",        thresholds: [{above: 12, scale: 0.85}, {above: 18, scale: 0.70}] },
+      { selector: ".kpi-sub",          thresholds: [{above: 20, scale: 0.85}, {above: 30, scale: 0.72}] },
+      { selector: ".t-text",           thresholds: [{above: 25, scale: 0.88}, {above: 40, scale: 0.74}, {above: 55, scale: 0.60}] },
+      { selector: ".t-label",          thresholds: [{above: 10, scale: 0.85}] },
+      { selector: ".cta-title",        thresholds: [{above: 20, scale: 0.88}, {above: 28, scale: 0.72}] },
+      { selector: ".cta-text",         thresholds: [{above: 30, scale: 0.85}, {above: 50, scale: 0.70}] },
+      { selector: ".big-stat-value",   thresholds: [{above: 4, scale: 0.85},  {above: 6, scale: 0.70},  {above: 8, scale: 0.55}] },
+      { selector: ".big-stat-unit",    thresholds: [{above: 8, scale: 0.85}] },
+      { selector: ".big-stat-name-main", thresholds: [{above: 14, scale: 0.85}, {above: 20, scale: 0.72}] },
+      { selector: ".big-stat-delta",   thresholds: [{above: 20, scale: 0.85}] },
+      { selector: ".terminal-line",    thresholds: [{above: 30, scale: 0.85}, {above: 45, scale: 0.72}, {above: 58, scale: 0.62}] },
+      { selector: ".chip-pill",        thresholds: [{above: 10, scale: 0.85}, {above: 16, scale: 0.72}] },
+      { selector: ".tag-chip",         thresholds: [{above: 14, scale: 0.85}, {above: 20, scale: 0.72}] },
+      { selector: ".sub-text",         thresholds: [{above: 40, scale: 0.90}, {above: 60, scale: 0.80}, {above: 90, scale: 0.65}] },
+    ];
+    FIT_RULES.forEach(function(rule) {
+      document.querySelectorAll(rule.selector).forEach(function(el) {
+        autoFitByCharCount(el, rule.thresholds);
+      });
+    });
+
+    window.__timelines = window.__timelines || {};
+    const tl = gsap.timeline({ paused: true });
+    const TOTAL = {{ '%.2f'|format(total_duration) }};
+
+    {% for scene in scenes %}
+    {% set L = scene.layout_id.value if scene.layout_id is not string else scene.layout_id %}
+    {% set s = scene.scene_index %}
+    {% set st = scene.start %}
+    {# v26 THUMBNAIL FIX: scene 1 must be FULLY VISIBLE at t=0 because FB/TikTok
+       pick frame 0 as thumbnail. Shift inner element animations by +0.08s so
+       frame 0 captures elements at TARGET (final) state, not at FROM (invisible). #}
+    {% set anim_st = (st + 0.08) if scene.scene_index == 1 else st %}
+    // ─── Scene {{ s }} ({{ L }}) [{{ '%.2f'|format(scene.start) }}–{{ '%.2f'|format(scene.start + scene.duration) }}] ───
+    {% if scene.scene_index > 1 %}
+    tl.set("#scene-{{ s }}", { opacity: 0 }, 0);
+    tl.to("#scene-{{ s }}", { opacity: 1, duration: 0.4, overwrite: "auto" }, {{ '%.2f'|format(st) }});
+    {% else %}
+    // Scene 1: stay visible from t=0 (thumbnail frame).
+    tl.set("#scene-{{ s }}", { opacity: 1 }, 0);
+    {% endif %}
+
+    {% if L == "TitleHero" %}
+    {% if scene.scene_index == 1 %}
+    // v32 THUMBNAIL: scene 1 = STATIC title from t=0 (no reveal anims).
+    // Icon pulse later for subtle life. FB/TikTok thumb captures full title từ first frame.
+    tl.to("#scene-{{ s }}-icon", { scale: 1.08, duration: 0.5, repeat: 5, yoyo: true, ease: "sine.inOut", overwrite: "auto" }, 2.0);
+    {% else %}
+    // Subsequent TitleHero scenes (rare) — full reveal animations
+    tl.from("#scene-{{ s }}-card",     { scale: 0.85, opacity: 0, duration: 0.6, ease: "back.out(1.4)", overwrite: "auto" }, {{ '%.2f'|format(anim_st) }});
+    tl.from("#scene-{{ s }}-icon",     { scale: 0, rotation: -20, opacity: 0, duration: 0.5, ease: "back.out(2)", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.3) }});
+    tl.from("#scene-{{ s }}-title",    { y: 60, opacity: 0, duration: 0.6, ease: "power3.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.6) }});
+    tl.from("#scene-{{ s }}-subtitle", { y: 30, opacity: 0, duration: 0.5, ease: "power2.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 1.1) }});
+    {% if scene.slots.tag_chips %}
+    {% for chip in scene.slots.tag_chips %}
+    tl.from("#scene-{{ s }}-chip-{{ loop.index }}", { x: -30, opacity: 0, duration: 0.4, ease: "power2.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 1.5 + (loop.index0 * 0.15)) }});
+    {% endfor %}
+    {% endif %}
+    tl.to("#scene-{{ s }}-icon", { scale: 1.08, duration: 0.5, repeat: 3, yoyo: true, ease: "sine.inOut", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 2.5) }});
+    {% endif %}
+
+    {% elif L == "BulletList" %}
+    tl.from("#scene-{{ s }}-title", { y: 50, opacity: 0, duration: 0.5, ease: "power3.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.2) }});
+    {# v32: ALL bullets reveal TOGETHER as group — full list visible from early.
+       v33: karaoke timing = char-weighted per-sentence (pre-computed in composer.py)
+       so highlight stays synced với voice ngay cả khi câu intro dài hơn 1.5s buffer. #}
+    {% set n_bullets = scene.slots.bullets|length %}
+    tl.from("#scene-{{ s }}-list", { y: 30, opacity: 0, duration: 0.5, ease: "power2.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.5) }});
+    {% set bullet_timings = scene.bullet_timings if scene.bullet_timings else [] %}
+    {% for bullet in scene.slots.bullets %}
+    {% set rel_t = bullet_timings[loop.index0] if loop.index0 < bullet_timings|length else (1.5 + loop.index0 * 3.0) %}
+    tl.call(function() {
+      var scene_root = document.getElementById("scene-{{ s }}");
+      if (!scene_root) return;
+      // v30: only swap CSS class — no GSAP transform (no zoom/translate, just bg color change)
+      scene_root.querySelectorAll(".bullet").forEach(function(b) { b.classList.remove("bullet-active"); });
+      var el = document.getElementById("scene-{{ s }}-bullet-{{ loop.index }}");
+      if (el) el.classList.add("bullet-active");
+    }, null, {{ '%.2f'|format(anim_st + rel_t) }});
+    {% endfor %}
+    {# Clear active class at end of scene (otherwise leaks to next scene) #}
+    tl.call(function() {
+      var sr = document.getElementById("scene-{{ s }}");
+      if (!sr) return;
+      sr.querySelectorAll(".bullet").forEach(function(b) { b.classList.remove("bullet-active"); });
+    }, null, {{ '%.2f'|format(anim_st + scene.duration - 0.2) }});
+
+    {% elif L == "KPIGrid" %}
+    tl.from("#scene-{{ s }}-title", { y: 50, opacity: 0, duration: 0.5, ease: "power3.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.2) }});
+    {% for item in scene.slots.items %}
+    tl.from("#scene-{{ s }}-card-{{ loop.index }}", { y: 60, opacity: 0, duration: 0.5, ease: "back.out(1.5)", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.6 + (loop.index0 * 0.25)) }});
+    // Number pulse + gold flash — emphasize the value
+    tl.fromTo("#scene-{{ s }}-value-{{ loop.index }}",
+      { scale: 0.7, color: "#fff" },
+      { scale: 1.18, color: "#fbbf24", duration: 0.55, ease: "back.out(2.5)", overwrite: "auto" },
+      {{ '%.2f'|format(anim_st + 0.85 + (loop.index0 * 0.25)) }});
+    tl.to("#scene-{{ s }}-value-{{ loop.index }}",
+      { scale: 1.0, color: "var(--teal, #22d3ee)", duration: 0.4, ease: "power2.inOut", overwrite: "auto" },
+      {{ '%.2f'|format(anim_st + 1.4 + (loop.index0 * 0.25)) }});
+    tl.to("#scene-{{ s }}-card-{{ loop.index }}",
+      { boxShadow: "0 0 60px rgba(251, 191, 36, 0.6)", duration: 0.3, yoyo: true, repeat: 1, ease: "sine.inOut", overwrite: "auto" },
+      {{ '%.2f'|format(anim_st + 0.9 + (loop.index0 * 0.25)) }});
+    {% endfor %}
+
+    {% elif L == "Timeline" %}
+    {# CEO 2026-06-17 bug #3: subtitle ticker (#subtitle, default bottom:520)
+       was overlapping the last 1-2 Timeline items, especially with 5+ steps.
+       Dip the subtitle down to bottom:380 for the whole Timeline scene so
+       it sits above the citation chip (bottom:300) but well below the last
+       step row. Return to 520 just before the scene ends so the next scene
+       starts from the canonical position. #}
+    tl.to("#subtitle", { bottom: 380, duration: 0.4, ease: "power2.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.2) }});
+    tl.to("#subtitle", { bottom: 520, duration: 0.4, ease: "power2.in",  overwrite: "auto" }, {{ '%.2f'|format(scene.start + scene.duration - 0.4) }});
+    tl.from("#scene-{{ s }}-title", { y: 50, opacity: 0, duration: 0.5, ease: "power3.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.2) }});
+    {% for step in scene.slots.steps %}
+    tl.from("#scene-{{ s }}-step-{{ loop.index }}", { x: -60, opacity: 0, duration: 0.5, ease: "power2.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.7 + (loop.index0 * 0.6)) }});
+    {% endfor %}
+
+    {% elif L == "CTAOutro" %}
+    tl.from("#scene-{{ s }}-card",  { scale: 0.85, opacity: 0, duration: 0.5, ease: "back.out(1.4)", overwrite: "auto" }, {{ '%.2f'|format(anim_st) }});
+    tl.from("#scene-{{ s }}-icon",  { scale: 0, rotation: -180, opacity: 0, duration: 0.6, ease: "back.out(2)", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.3) }});
+    tl.from("#scene-{{ s }}-title", { y: 40, opacity: 0, duration: 0.5, ease: "power3.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.7) }});
+    tl.from("#scene-{{ s }}-text",  { y: 30, opacity: 0, duration: 0.4, ease: "power2.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 1.1) }});
+    tl.from("#scene-{{ s }}-brand", { y: 30, opacity: 0, duration: 0.4, ease: "power2.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 1.4) }});
+    tl.to("#scene-{{ s }}-icon",    { scale: 1.15, duration: 0.5, repeat: 6, yoyo: true, ease: "sine.inOut", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 1.8) }});
+
+    {% elif L == "HeroCardWithLogo" %}
+    {% if scene.scene_index == 1 %}
+    // v32 THUMBNAIL: scene 1 static từ t=0. Logobox breathing as subtle motion.
+    tl.to("#scene-{{ s }}-logobox", { scale: 1.04, duration: 1.6, repeat: 3, yoyo: true, ease: "sine.inOut", overwrite: "auto" }, 1.5);
+    {% else %}
+    tl.from("#scene-{{ s }}-card",     { opacity: 0, duration: 0.6, ease: "power2.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st) }});
+    tl.from("#scene-{{ s }}-logobox",  { scale: 0.3, opacity: 0, rotation: -8, duration: 0.9, ease: "back.out(1.6)", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.1) }});
+    {% if scene.slots.badge_label %}
+    tl.from("#scene-{{ s }}-badge",    { y: 20, opacity: 0, duration: 0.5, ease: "power2.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.9) }});
+    {% endif %}
+    tl.from("#scene-{{ s }}-title",    { y: 60, opacity: 0, duration: 0.7, ease: "power3.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 1.0) }});
+    {% if scene.slots.pill_text %}
+    tl.from("#scene-{{ s }}-pill",     { y: 30, opacity: 0, duration: 0.5, ease: "power2.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 1.5) }});
+    {% endif %}
+    {% if scene.slots.tag_chips %}
+    {% for c in scene.slots.tag_chips %}
+    tl.from("#scene-{{ s }}-chip-{{ loop.index }}", { x: -25, opacity: 0, duration: 0.45, ease: "power2.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 1.9 + (loop.index0 * 0.15)) }});
+    {% endfor %}
+    {% endif %}
+    tl.to("#scene-{{ s }}-logobox", { scale: 1.04, duration: 1.6, repeat: 2, yoyo: true, ease: "sine.inOut", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 2.6) }});
+    {% endif %}
+
+    {% elif L == "BigStatCard" %}
+    tl.from("#scene-{{ s }}-card",       { y: 60, opacity: 0, duration: 0.7, ease: "back.out(1.4)", overwrite: "auto" }, {{ '%.2f'|format(anim_st) }});
+    tl.from("#scene-{{ s }}-nametop",    { x: -30, opacity: 0, duration: 0.5, ease: "power2.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.5) }});
+    tl.from("#scene-{{ s }}-namemain",   { x: -40, opacity: 0, duration: 0.6, ease: "power3.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.7) }});
+    {% if scene.slots.delta_text %}
+    tl.from("#scene-{{ s }}-delta",      { y: 20, opacity: 0, duration: 0.4, ease: "power2.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 1.0) }});
+    {% endif %}
+    tl.fromTo("#scene-{{ s }}-bigvalue",
+      { scale: 0.3, opacity: 0 },
+      { scale: 1.12, opacity: 1, duration: 0.85, ease: "back.out(2.2)", overwrite: "auto" },
+      {{ '%.2f'|format(anim_st + 1.1) }});
+    tl.to("#scene-{{ s }}-bigvalue",  { scale: 1.0, duration: 0.35, ease: "power2.inOut", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 2.0) }});
+    tl.from("#scene-{{ s }}-bigunit", { y: 15, opacity: 0, duration: 0.4, ease: "power2.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 1.7) }});
+    {% if scene.slots.chips_grid %}
+    {% for c in scene.slots.chips_grid %}
+    tl.from("#scene-{{ s }}-chip-{{ loop.index }}", { y: 20, opacity: 0, duration: 0.35, ease: "power2.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 2.3 + (loop.index0 * 0.1)) }});
+    {% endfor %}
+    {% endif %}
+    tl.to("#scene-{{ s }}-bigvalue", { textShadow: "0 0 40px rgba(251,191,36,0.7)", duration: 0.5, yoyo: true, repeat: 3, ease: "sine.inOut", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 2.5) }});
+
+    {% elif L == "ScreenshotEmbed" %}
+    {# Dynamic subtitle dip — make sure the device mockup doesn't crash into
+       the subtitle. iPhone is the tallest device so it gets the deepest dip
+       (bottom: 260); the browser/highlight chrome only needs the lighter
+       430-dip used by the original v30 logic. Sub returns to 520 just before
+       the scene ends so the next scene starts from the canonical position. #}
+    {% set is_iphone = scene.slots.variant == "iphone" %}
+    {% set has_under_chrome = (scene.slots.variant == "browser" and scene.slots.caption)
+                              or (scene.slots.variant == "highlight" and (scene.slots.stat_big or scene.slots.stat_text)) %}
+    {% if is_iphone %}
+    tl.to("#subtitle", { bottom: 260, duration: 0.4, ease: "power2.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.2) }});
+    tl.to("#subtitle", { bottom: 520, duration: 0.4, ease: "power2.in",  overwrite: "auto" }, {{ '%.2f'|format(scene.start + scene.duration - 0.4) }});
+    {% elif has_under_chrome %}
+    tl.to("#subtitle", { bottom: 430, duration: 0.4, ease: "power2.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.2) }});
+    tl.to("#subtitle", { bottom: 520, duration: 0.4, ease: "power2.in",  overwrite: "auto" }, {{ '%.2f'|format(scene.start + scene.duration - 0.4) }});
+    {% endif %}
+    // Window slides up + fades in, then content reveals
+    tl.from("#scene-{{ s }}-window", { y: 80, opacity: 0, scale: 0.92, duration: 0.7, ease: "back.out(1.5)", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.1) }});
+    {% if scene.slots.variant == "highlight" %}
+    // Highlight box appears AFTER window settles
+    tl.from("#scene-{{ s }}-hl", { scale: 0.5, opacity: 0, duration: 0.5, ease: "back.out(2)", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 1.2) }});
+    tl.from("#scene-{{ s }}-stat", { y: 30, opacity: 0, duration: 0.4, ease: "power2.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 1.6) }});
+    {% endif %}
+    {% if scene.slots.variant == "browser" and scene.slots.caption %}
+    tl.from("#scene-{{ s }}-cap", { y: 30, opacity: 0, duration: 0.5, ease: "power2.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 1.0) }});
+    {% endif %}
+    {% if scene.slots.variant == "stack" %}
+    // Stack reveals 3 cards in sequence
+    tl.from("#scene-{{ s }}-stack-1", { y: 60, opacity: 0, rotation: -12, duration: 0.5, ease: "back.out(1.6)", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.3) }});
+    tl.from("#scene-{{ s }}-stack-2", { y: 60, opacity: 0, rotation: 10,  duration: 0.5, ease: "back.out(1.6)", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.6) }});
+    tl.from("#scene-{{ s }}-stack-3", { y: 60, opacity: 0, rotation: -8,  duration: 0.5, ease: "back.out(1.6)", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.9) }});
+    {% endif %}
+
+    {% elif L == "TerminalWindow" %}
+    {% if scene.slots.badge_label %}
+    tl.from("#scene-{{ s }}-badge",    { y: -20, opacity: 0, duration: 0.5, ease: "power2.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st) }});
+    {% endif %}
+    tl.from("#scene-{{ s }}-terminal", { y: 50, opacity: 0, duration: 0.7, ease: "back.out(1.3)", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.3) }});
+    {% for line in scene.slots.command_lines %}
+    tl.from("#scene-{{ s }}-cmd-{{ loop.index }}", { x: -30, opacity: 0, duration: 0.4, ease: "power2.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 0.9 + (loop.index0 * 0.5)) }});
+    {% endfor %}
+    {% if scene.slots.chips_grid %}
+    {% for c in scene.slots.chips_grid %}
+    tl.from("#scene-{{ s }}-chip-{{ loop.index }}", { y: 20, opacity: 0, duration: 0.35, ease: "power2.out", overwrite: "auto" }, {{ '%.2f'|format(anim_st + 1.8 + (loop.index0 * 0.1)) }});
+    {% endfor %}
+    {% endif %}
+    {% endif %}
+
+    {% if not loop.last %}
+    // Fade-out near the end of this scene (last scene stays visible)
+    tl.to("#scene-{{ s }}", { opacity: 0, duration: 0.4, ease: "power2.in", overwrite: "auto" }, {{ '%.2f'|format(scene.start + scene.duration - 0.5) }});
+    {% endif %}
+    {% endfor %}
+
+    // ─── Subtitle ticker (data-driven from Python) ───
+    const subTexts = {{ subtitle_segments | tojson }};
+    subTexts.forEach(seg => {
+      tl.call(() => { document.getElementById("sub-text").innerHTML = seg.text; }, null, seg.t);
+    });
+    // Force the sub box back to empty just before the final frame so the
+    // ``.sub-text:empty { display: none; }`` rule in each theme hides the
+    // padded pill on the LAST frame of the MP4 (HyperFrames snapshots that
+    // frame as the closing thumbnail). Without this, the previous segment's
+    // text lingers and the dark sub pill is the last thing viewers see.
+    tl.call(() => { document.getElementById("sub-text").innerHTML = ""; },
+            null, Math.max(0, TOTAL - 0.05));
+
+    // ─── Brand chip subtle breathing ───
+    tl.to("#profile-chip", { scale: 1.04, duration: 1.8, repeat: Math.ceil(TOTAL / 3.6), yoyo: true, ease: "sine.inOut" }, 0);
+
+    window.__timelines["main"] = tl;
+  </script>
+</body>
+</html>

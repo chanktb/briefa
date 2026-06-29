@@ -1,0 +1,16 @@
+<div id="scene-{{ scene.scene_index }}" class="scene clip"
+     data-start="{{ '%.2f'|format(scene.start) }}"
+     data-duration="{{ '%.2f'|format(scene.duration) }}"
+     data-track-index="3">
+  <div class="cta-card" id="scene-{{ scene.scene_index }}-card">
+    <div class="cta-icon" id="scene-{{ scene.scene_index }}-icon">{{ scene.slots.icon }}</div>
+    <div class="cta-title" id="scene-{{ scene.scene_index }}-title">
+      {{ scene.slots.title_top | highlight(scene.slots.highlight_word) }}
+    </div>
+    <div class="cta-text" id="scene-{{ scene.scene_index }}-text">{{ scene.slots.text }}</div>
+    <div class="brand-row" id="scene-{{ scene.scene_index }}-brand">
+      <span class="brand-logo" id="scene-{{ scene.scene_index }}-brand-logo">{{ scene.slots.icon }}</span>
+      <span class="brand-name" id="scene-{{ scene.scene_index }}-brand-name">{{ channel.channel_handle }}</span>
+    </div>
+  </div>
+</div>

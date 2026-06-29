@@ -1,0 +1,31 @@
+{# TerminalWindow — Mac-style terminal with $ command lines #}
+<div id="scene-{{ scene.scene_index }}" class="scene clip"
+     data-start="{{ '%.2f'|format(scene.start) }}"
+     data-duration="{{ '%.2f'|format(scene.duration) }}"
+     data-track-index="3">
+  {% if scene.slots.badge_label %}
+  <div id="scene-{{ scene.scene_index }}-badge" class="terminal-badge">
+    <span class="badge-icon">&gt;_</span>
+    <span class="badge-text">{{ scene.slots.badge_label }}</span>
+  </div>
+  {% endif %}
+  <div id="scene-{{ scene.scene_index }}-terminal" class="terminal-window">
+    <div class="terminal-dots">
+      <span class="tdot tdot-red"></span>
+      <span class="tdot tdot-yellow"></span>
+      <span class="tdot tdot-green"></span>
+    </div>
+    <div class="terminal-body">
+      {% for line in scene.slots.command_lines %}
+      <div id="scene-{{ scene.scene_index }}-cmd-{{ loop.index }}" class="terminal-line">{{ line }}</div>
+      {% endfor %}
+    </div>
+  </div>
+  {% if scene.slots.chips_grid %}
+  <div id="scene-{{ scene.scene_index }}-grid" class="terminal-chips">
+    {% for chip in scene.slots.chips_grid %}
+    <span id="scene-{{ scene.scene_index }}-chip-{{ loop.index }}" class="chip-pill">{{ chip }}</span>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>

@@ -1,0 +1,59 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "briefa"
+version = "0.1.0"
+description = "Factual briefing video — không sáng tác. N inputs (URL article + GitHub repo + text + images) → 1 neutral MP4 with citation chip per scene."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "KTB Team", email = "hi@khuetran.com" }]
+keywords = ["video", "briefing", "news", "ai", "factual", "citation"]
+
+dependencies = [
+    # HTTP + scraping
+    "httpx>=0.27",
+    "beautifulsoup4>=4.12",
+    "lxml>=5.2",
+    "trafilatura>=1.12",
+    # LLM + vision
+    "google-genai>=1.0",
+    # TTS — pin >=7.0 vì 6.1.x dead từ 2026 (xem DECISIONS.md D003 + ktb-news-editor lessons)
+    "edge-tts>=7.0",
+    "gtts>=2.5",
+    # Render
+    "jinja2>=3.1",
+    "pillow>=10.3",
+    # Config
+    "pydantic>=2.7",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.2",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.5",
+]
+
+[project.scripts]
+briefa = "briefa.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["briefa*"]
+exclude = ["channels*", "output*", "jobs*", "SESSIONS*", "tests*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = ["E501"]  # line length handled by formatter
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

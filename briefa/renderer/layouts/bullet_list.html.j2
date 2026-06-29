@@ -1,0 +1,15 @@
+<div id="scene-{{ scene.scene_index }}" class="scene clip"
+     data-start="{{ '%.2f'|format(scene.start) }}"
+     data-duration="{{ '%.2f'|format(scene.duration) }}"
+     data-track-index="3">
+  <div class="scene-title" id="scene-{{ scene.scene_index }}-title">
+    {{ scene.slots.section_title | highlight(scene.slots.highlight_word) }}
+  </div>
+  <div class="bullet-list" id="scene-{{ scene.scene_index }}-list">
+    {% for bullet in scene.slots.bullets %}
+    <div class="bullet" id="scene-{{ scene.scene_index }}-bullet-{{ loop.index }}">
+      <span class="bullet-num" id="scene-{{ scene.scene_index }}-bullet-{{ loop.index }}-num">{{ '%02d'|format(loop.index) }}</span>{{ bullet }}
+    </div>
+    {% endfor %}
+  </div>
+</div>

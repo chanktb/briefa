@@ -1,0 +1,19 @@
+<div id="scene-{{ scene.scene_index }}" class="scene clip"
+     data-start="{{ '%.2f'|format(scene.start) }}"
+     data-duration="{{ '%.2f'|format(scene.duration) }}"
+     data-track-index="3">
+  <div class="scene-title" id="scene-{{ scene.scene_index }}-title">
+    {{ scene.slots.section_title | highlight(scene.slots.highlight_word) }}
+  </div>
+  <div class="timeline" id="scene-{{ scene.scene_index }}-timeline">
+    {% for step in scene.slots.steps %}
+    <div class="t-item" id="scene-{{ scene.scene_index }}-step-{{ loop.index }}">
+      <div class="t-dot t{{ loop.index }}" id="scene-{{ scene.scene_index }}-dot-{{ loop.index }}">{{ loop.index }}</div>
+      <div class="t-content" id="scene-{{ scene.scene_index }}-content-{{ loop.index }}">
+        <div class="t-label" id="scene-{{ scene.scene_index }}-tlabel-{{ loop.index }}">{{ step.label }}</div>
+        <div class="t-text" id="scene-{{ scene.scene_index }}-ttext-{{ loop.index }}">{{ step.text }}</div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>

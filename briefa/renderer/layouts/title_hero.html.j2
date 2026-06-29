@@ -1,0 +1,21 @@
+<div id="scene-{{ scene.scene_index }}" class="scene clip"
+     data-start="{{ '%.2f'|format(scene.start) }}"
+     data-duration="{{ '%.2f'|format(scene.duration) }}"
+     data-track-index="3">
+  <div class="hero-card" id="scene-{{ scene.scene_index }}-card">
+    <div class="hero-icon" id="scene-{{ scene.scene_index }}-icon">{{ scene.slots.icon }}</div>
+    <div class="hero-title" id="scene-{{ scene.scene_index }}-title">
+      {{ scene.slots.title_top | highlight_hot(scene.slots.highlight_word) }}{% if scene.slots.title_bottom %}<br/>
+      {{ scene.slots.title_bottom | highlight_hot(scene.slots.highlight_word) }}{% endif %}
+    </div>
+    <div class="hero-subtitle" id="scene-{{ scene.scene_index }}-subtitle">{{ scene.slots.subtitle }}</div>
+    {% if scene.slots.tag_chips %}
+    <div class="chip-row" id="scene-{{ scene.scene_index }}-chips">
+      {% for chip in scene.slots.tag_chips %}
+      <span class="tag-chip{% if loop.index0 > 0 %} accent{% endif %}"
+            id="scene-{{ scene.scene_index }}-chip-{{ loop.index }}">{{ chip }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>

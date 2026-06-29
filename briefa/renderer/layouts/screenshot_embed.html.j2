@@ -1,0 +1,176 @@
+{# ScreenshotEmbed layout — 5 variants wrapping source content in device chrome.
+   scene.image_urls is set by composer (list of relative paths under job_dir/static/).
+   Variant chosen by Gemini in slots.variant: browser | highlight | iphone | minimal | stack. #}
+{% set sl = scene.slots %}
+{% set variant = sl.variant if sl.variant else "browser" %}
+{% set imgs = scene.image_urls if scene.image_urls is defined else [] %}
+{% set first_img = imgs[0] if imgs|length > 0 else "" %}
+{# Strip scheme + path so URL bars only show the domain. Planner sometimes
+   emits "vnexpress.net/some-slug" or a full https URL; we want "vnexpress.net". #}
+{% set _raw_url = sl.display_url or "source.url" %}
+{% set display_domain = _raw_url.replace("https://", "").replace("http://", "").split("/")[0] %}
+
+<div id="scene-{{ scene.scene_index }}" class="scene clip"
+     data-start="{{ '%.2f'|format(scene.start) }}"
+     data-duration="{{ '%.2f'|format(scene.duration) }}"
+     data-track-index="3">
+
+  {# v37: skip rendering outer scene-title when empty (inject iPhone reader scene
+     uses empty section_title vì iPhone đã có headline bên trong + tránh overflow). #}
+  {% if sl.section_title %}
+  <div class="scene-title" id="scene-{{ scene.scene_index }}-title">
+    {{ sl.section_title | highlight(sl.highlight_word) }}
+  </div>
+  {% endif %}
+
+  {# ═══════════════ VARIANT A — Browser Screenshot ═══════════════ #}
+  {% if variant == "browser" %}
+  <div class="se-mac-window se-variant-browser" id="scene-{{ scene.scene_index }}-window">
+    <div class="se-mac-titlebar">
+      <div class="se-mac-dots"><span class="se-dot se-dot-red"></span><span class="se-dot se-dot-yellow"></span><span class="se-dot se-dot-green"></span></div>
+      <div class="se-url-bar">
+        <span class="se-lock">🔒</span>
+        <span class="se-url-domain">{{ display_domain }}</span>
+      </div>
+    </div>
+    <div class="se-mac-content">
+      {% if first_img %}<img src="{{ first_img }}" alt="" />
+      {% else %}<div class="se-img-fallback">📰</div>{% endif %}
+    </div>
+  </div>
+  {% if sl.caption %}
+  <div class="se-caption" id="scene-{{ scene.scene_index }}-cap">{{ sl.caption }}</div>
+  {% endif %}
+  {% endif %}
+
+  {# ═══════════════ VARIANT B — Highlight Box + Stat Callout ═══════════════ #}
+  {% if variant == "highlight" %}
+  <div class="se-mac-window se-variant-highlight" id="scene-{{ scene.scene_index }}-window">
+    <div class="se-mac-titlebar">
+      <div class="se-mac-dots"><span class="se-dot se-dot-red"></span><span class="se-dot se-dot-yellow"></span><span class="se-dot se-dot-green"></span></div>
+      <div class="se-url-bar">
+        <span class="se-lock">🔒</span>
+        <span class="se-url-domain">{{ display_domain }}</span>
+      </div>
+    </div>
+    <div class="se-mac-content">
+      {% if first_img %}<img src="{{ first_img }}" alt="" />
+      {% else %}<div class="se-img-fallback">📊</div>{% endif %}
+      <div class="se-highlight-box" id="scene-{{ scene.scene_index }}-hl"></div>
+      <div class="se-highlight-arrow">👈</div>
+    </div>
+  </div>
+  {% if sl.stat_big or sl.stat_text %}
+  <div class="se-stat-callout" id="scene-{{ scene.scene_index }}-stat">
+    {% if sl.stat_big %}<span class="se-stat-big">{{ sl.stat_big }}</span> {% endif %}{{ sl.stat_text }}
+  </div>
+  {% endif %}
+  {% endif %}
+
+  {# ═══════════════ VARIANT F — MacBook Window Reader (default for text inputs) ═══════════════
+     CEO 2026-06-14: replaces the iPhone reader. Wider article column, no
+     status-bar / Dynamic Island tells. Mac chrome (3 dots + URL bar) reads
+     like a publication site rather than a phone screenshot. #}
+  {% if variant == "mac_reader" %}
+  <div class="se-mac-window se-variant-mac-reader" id="scene-{{ scene.scene_index }}-window">
+    <div class="se-mac-titlebar">
+      <div class="se-mac-dots"><span class="se-dot se-dot-red"></span><span class="se-dot se-dot-yellow"></span><span class="se-dot se-dot-green"></span></div>
+      <div class="se-url-bar">
+        <span class="se-lock">🔒</span>
+        <span class="se-url-domain">{{ display_domain }}</span>
+      </div>
+    </div>
+    <div class="se-mac-content se-mac-reader-content">
+      <div class="se-mac-article">
+        {% if sl.article_category %}<div class="se-art-category">{{ sl.article_category }}</div>{% endif %}
+        <div class="se-art-headline se-mac-headline">{{ sl.article_headline or sl.section_title }}</div>
+        {% if sl.article_byline %}<div class="se-art-byline se-mac-byline">{{ sl.article_byline }}</div>{% endif %}
+        {% if first_img %}
+        <div class="se-art-hero se-mac-hero" style="background-image: url('{{ first_img }}');"></div>
+        {% endif %}
+        {% if sl.article_pullquote %}
+        <div class="se-art-pullquote se-mac-pullquote">"{{ sl.article_pullquote }}"</div>
+        {% endif %}
+        {% if sl.article_body %}
+        <div class="se-art-body se-mac-body">{{ sl.article_body|safe }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {# ═══════════════ VARIANT C — iPhone Mockup with Article (DEPRECATED — kept for back-compat) ═══════════════ #}
+  {% if variant == "iphone" %}
+  <div class="se-iphone se-variant-iphone" id="scene-{{ scene.scene_index }}-window">
+    <div class="se-iphone-screen">
+      <div class="se-dynamic-island"></div>
+      {# Status bar slot intentionally empty — fake "9:41" and signal icons read
+         as cheap iPhone-screenshot tells, especially across multiple scenes
+         using the same time. Keep the div so .se-safari-bar below sits at the
+         expected offset; the inner spans render with no content. #}
+      <div class="se-ios-statusbar">
+        <span class="se-time"></span>
+        <span class="se-icons"></span>
+      </div>
+      <div class="se-safari-bar">
+        <span class="se-lock">🔒</span>
+        <span class="se-url-domain">{{ display_domain }}</span>
+      </div>
+      <div class="se-article{% if not first_img and sl.article_body %} se-art-reader{% endif %}">
+        {% if sl.article_category %}<div class="se-art-category">{{ sl.article_category }}</div>{% endif %}
+        <div class="se-art-headline">{{ sl.article_headline or sl.section_title }}</div>
+        {% if sl.article_byline %}<div class="se-art-byline">{{ sl.article_byline }}</div>{% endif %}
+        {% if first_img %}
+        <div class="se-art-hero" style="background-image: url('{{ first_img }}');"></div>
+        {% endif %}
+        {% if sl.article_pullquote %}
+        <div class="se-art-pullquote">"{{ sl.article_pullquote }}"</div>
+        {% endif %}
+        {# v34: reader mode body (no image fallback) — render synth article paragraphs #}
+        {% if sl.article_body and not first_img %}
+        <div class="se-art-body">{{ sl.article_body|safe }}</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  {# ═══════════════ VARIANT D — Minimal Photo Window ═══════════════ #}
+  {% if variant == "minimal" %}
+  <div class="se-mac-window se-variant-minimal" id="scene-{{ scene.scene_index }}-window">
+    <div class="se-mac-titlebar se-minimal-titlebar">
+      <div class="se-mac-dots"><span class="se-dot se-dot-red"></span><span class="se-dot se-dot-yellow"></span><span class="se-dot se-dot-green"></span></div>
+      <div class="se-filename">{{ sl.filename or "image.jpg" }}</div>
+    </div>
+    <div class="se-mac-content se-minimal-content">
+      {% if first_img %}<img src="{{ first_img }}" alt="" />
+      {% else %}<div class="se-img-fallback">🖼️</div>{% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  {# ═══════════════ VARIANT E — Photo Stack ═══════════════ #}
+  {% if variant == "stack" %}
+  <div class="se-stack-container se-variant-stack" id="scene-{{ scene.scene_index }}-window">
+    {% for i in range(3) %}
+    <div class="se-stack-item se-stack-{{ i + 1 }}" id="scene-{{ scene.scene_index }}-stack-{{ i + 1 }}">
+      <div class="se-stack-titlebar">
+        <div class="se-mac-dots"><span class="se-dot se-dot-red"></span><span class="se-dot se-dot-yellow"></span><span class="se-dot se-dot-green"></span></div>
+        <div class="se-stack-count">{{ i + 1 }} / {{ sl.total_photo_count }}</div>
+      </div>
+      <div class="se-stack-content">
+        {% if imgs|length > i and imgs[i] %}<img src="{{ imgs[i] }}" alt="" />
+        {% else %}<div class="se-img-fallback">📷</div>{% endif %}
+      </div>
+      {% if i == 2 %}
+      <div class="se-stack-badge">
+        <div class="se-stack-badge-num">{{ sl.total_photo_count }}</div>
+        <div class="se-stack-badge-lbl">ẢNH</div>
+      </div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+</div>

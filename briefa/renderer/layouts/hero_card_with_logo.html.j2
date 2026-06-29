@@ -1,0 +1,32 @@
+{# HeroCardWithLogo — escbase-style opener with huge squircle logo #}
+<div id="scene-{{ scene.scene_index }}" class="scene clip"
+     data-start="{{ '%.2f'|format(scene.start) }}"
+     data-duration="{{ '%.2f'|format(scene.duration) }}"
+     data-track-index="3">
+  <div id="scene-{{ scene.scene_index }}-card" class="hero-logo-card">
+    <div id="scene-{{ scene.scene_index }}-logobox" class="logo-squircle">
+      {% if scene.slots.logo_url %}
+      <img id="scene-{{ scene.scene_index }}-logo" class="logo-img"
+           src="{{ scene.slots.logo_url }}" alt="logo" />
+      {% else %}
+      <div id="scene-{{ scene.scene_index }}-logo" class="logo-fallback">🐙</div>
+      {% endif %}
+      {% if scene.slots.badge_label %}
+      <div id="scene-{{ scene.scene_index }}-badge" class="logo-badge">{{ scene.slots.badge_label }}</div>
+      {% endif %}
+    </div>
+    <div id="scene-{{ scene.scene_index }}-title" class="hero-logo-title">
+      {{ scene.slots.title | highlight_hot(scene.slots.highlight_word) | safe }}
+    </div>
+    {% if scene.slots.pill_text %}
+    <div id="scene-{{ scene.scene_index }}-pill" class="hero-logo-pill">{{ scene.slots.pill_text }}</div>
+    {% endif %}
+    {% if scene.slots.tag_chips %}
+    <div id="scene-{{ scene.scene_index }}-chips" class="chip-row">
+      {% for chip in scene.slots.tag_chips %}
+      <span id="scene-{{ scene.scene_index }}-chip-{{ loop.index }}" class="tag-chip{% if loop.index == 2 %} accent{% endif %}">{{ chip }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>

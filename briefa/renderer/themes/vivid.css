@@ -1,0 +1,320 @@
+/* ═══════════════════════════════════════════════════════════════════
+   vivid.css — playful / energetic theme variant.
+
+   Strategy: inherit the full ``dark.css`` then override the loudest
+   variables + the handful of selectors that visibly differ. This keeps
+   the layout slot CSS in one place (dark) and turns ``vivid`` into a
+   themed remix instead of a 1000-line duplicate.
+
+   Anh chose this variant for "sinh động" content — louder palette
+   (hot pink + tangerine + lime), bouncier spring animations, bigger
+   typography, gradient title text, more visible motion.
+   ═══════════════════════════════════════════════════════════════════ */
+
+{% include 'themes/dark.css' %}
+
+/* ──────────────────── Palette override ──────────────────── */
+:root {
+  /* Warm, candy-shop palette — keeps base dark + adds vivid accents. */
+  --bg-base:        #1a0a2e;     /* deep magenta-violet */
+  --bg-deep:        #0c0518;
+  --teal:           #ff4d8d;     /* hot pink replaces cyan as PRIMARY */
+  --mint:           #fbbf24;     /* tangerine yellow replaces mint as ACCENT */
+  --cyan-glow:      #ff6b9d;     /* pink glow replaces cyan glow */
+  --pink-hot:       #00f5d4;     /* neon mint replaces red as HIGHLIGHT  */
+  --gold:           #fde047;     /* candy gold */
+  --text:           #ffffff;
+  --text-soft:      #fde2f0;
+  --card-bg:        rgba(255, 77, 141, 0.10);
+  --card-border:    rgba(255, 77, 141, 0.55);
+  --card-glow:      rgba(255, 77, 141, 0.28);
+
+  /* Per-bullet accent rotation — vivid uses the full candy palette
+   * across the list so 4 bullets each get a distinct hue. */
+  --bullet-c1:      #ff4d8d;   /* hot pink */
+  --bullet-c2:      #fbbf24;   /* tangerine */
+  --bullet-c3:      #00f5d4;   /* neon mint */
+  --bullet-c4:      #a855f7;   /* purple */
+}
+
+/* ──────────────────── Background — center burst gradient ──────────────────── */
+/* Replace the corner-halo dark gradient with a CENTRE-RADIATING burst that
+   gently rotates. Reads as warm + alive. */
+#bg {
+  background:
+    radial-gradient(ellipse 900px 900px at 30% 25%, rgba(255, 77, 141, 0.45), transparent 60%),
+    radial-gradient(ellipse 850px 850px at 75% 80%, rgba(251, 191, 36, 0.35), transparent 60%),
+    radial-gradient(ellipse 600px 600px at 50% 50%, rgba(0, 245, 212, 0.22), transparent 65%),
+    radial-gradient(ellipse 700px 700px at 88% 18%, rgba(168, 85, 247, 0.30), transparent 60%),
+    linear-gradient(135deg, #1a0a2e 0%, #2d0a4a 45%, #1a0a2e 100%);
+  animation: vivid-bg-pulse 14s ease-in-out infinite;
+}
+@keyframes vivid-bg-pulse {
+  0%, 100% { filter: hue-rotate(0deg) saturate(1); }
+  50%      { filter: hue-rotate(18deg) saturate(1.15); }
+}
+
+/* Starfield → confetti dots in pink + yellow */
+.starfield {
+  background-image:
+    radial-gradient(2px 2px at 12% 18%, rgba(255, 77, 141, 0.85), transparent 50%),
+    radial-gradient(1.5px 1.5px at 28% 42%, rgba(251, 191, 36, 0.75), transparent 50%),
+    radial-gradient(2.5px 2.5px at 47% 73%, rgba(0, 245, 212, 0.80), transparent 50%),
+    radial-gradient(1.5px 1.5px at 61% 22%, rgba(253, 224, 71, 0.65), transparent 50%),
+    radial-gradient(2px 2px at 78% 58%, rgba(255, 107, 157, 0.75), transparent 50%),
+    radial-gradient(1.5px 1.5px at 88% 33%, rgba(168, 85, 247, 0.75), transparent 50%),
+    radial-gradient(2px 2px at 18% 78%, rgba(255, 255, 255, 0.85), transparent 50%),
+    radial-gradient(2.5px 2.5px at 92% 87%, rgba(0, 245, 212, 0.70), transparent 50%),
+    radial-gradient(1.5px 1.5px at 55% 91%, rgba(255, 77, 141, 0.75), transparent 50%),
+    radial-gradient(1.5px 1.5px at 38% 8%, rgba(251, 191, 36, 0.70), transparent 50%);
+  animation: vivid-confetti 16s linear infinite;
+}
+@keyframes vivid-confetti {
+  0%   { transform: translate(0, 0)        rotate(0deg); }
+  50%  { transform: translate(-20px, -15px) rotate(2deg); }
+  100% { transform: translate(-40px, -30px) rotate(0deg); }
+}
+
+/* Vignette pulled WAY back — vivid should feel open, not cinematic. */
+.vignette {
+  background: radial-gradient(ellipse at center, transparent 60%, rgba(0, 0, 0, 0.30) 100%);
+}
+
+/* ──────────────────── Typography — playful Poppins ──────────────────── */
+html, body {
+  font-family: "Poppins", "Inter", "Be Vietnam Pro", sans-serif;
+  font-weight: 600;
+}
+
+/* Bigger, gradient-fill TITLES so the eye locks on. */
+.hero-title, .hero-logo-title,
+.cta-title,
+.scene-title,
+.t-title {
+  background: linear-gradient(135deg, #fde047 0%, #ff6b9d 50%, #00f5d4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -1px;
+  text-shadow: 0 4px 24px rgba(255, 77, 141, 0.45);
+  font-weight: 900;
+}
+
+/* Hero & CTA SUBTITLES — solid white with strong pink shadow. */
+.hero-subtitle, .cta-text {
+  color: #fff;
+  text-shadow: 0 2px 12px rgba(255, 77, 141, 0.65);
+  font-weight: 700;
+}
+
+/* ──────────────────── Bullets — spring slide + rotation ──────────────────── */
+.bullet {
+  background: linear-gradient(90deg, rgba(255, 77, 141, 0.20), rgba(251, 191, 36, 0.10));
+  border-left: 6px solid var(--mint);
+  border-radius: 0 18px 18px 0;
+  box-shadow: 0 6px 20px rgba(255, 77, 141, 0.20);
+}
+.bullet .b-text, .bullet-text {
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Spring entry for bullets — replaces the dark slide-in with an elastic
+   pop. The base layout's BulletList template sets bullet-* animation
+   names; we don't change the timings, only the easing + transform. */
+@keyframes b-in {
+  0%   { opacity: 0; transform: translateX(-60px) rotate(-3deg) scale(0.9); }
+  60%  { opacity: 1; transform: translateX(8px)   rotate(0.5deg) scale(1.04); }
+  100% { opacity: 1; transform: translateX(0)     rotate(0deg)   scale(1); }
+}
+
+/* ──────────────────── Stats — pulsing accent ──────────────────── */
+.kpi-value, .big-stat-value {
+  background: linear-gradient(180deg, #fde047 0%, #ff6b9d 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  animation: vivid-pulse 2.2s ease-in-out infinite;
+}
+@keyframes vivid-pulse {
+  0%, 100% { transform: scale(1);    filter: drop-shadow(0 0 16px rgba(255, 77, 141, 0.4)); }
+  50%      { transform: scale(1.04); filter: drop-shadow(0 0 28px rgba(255, 77, 141, 0.7)); }
+}
+
+.kpi-label, .big-stat-name-main, .big-stat-name-top {
+  color: #fde047;       /* candy gold label */
+}
+
+/* ──────────────────── Chips — bounce-rotate ──────────────────── */
+.chip-pill, .tag-chip {
+  background: linear-gradient(90deg, rgba(255, 77, 141, 0.30), rgba(251, 191, 36, 0.20));
+  border: 2px solid var(--mint);
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  box-shadow: 0 4px 16px rgba(255, 77, 141, 0.35);
+  animation: chip-wiggle 3.5s ease-in-out infinite;
+}
+@keyframes chip-wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25%      { transform: rotate(-1.5deg); }
+  75%      { transform: rotate(1.5deg); }
+}
+
+/* ──────────────────── Cards (KPI/Stat containers) ──────────────────── */
+/* Brighter borders, warmer glow, slight skew so the grid doesn't feel rigid. */
+.kpi-card, .stat-card, .timeline-row {
+  background: linear-gradient(180deg, rgba(255, 77, 141, 0.10) 0%, rgba(251, 191, 36, 0.06) 100%);
+  border: 2.5px solid rgba(255, 77, 141, 0.55);
+  box-shadow:
+    0 0 24px rgba(255, 77, 141, 0.30),
+    inset 0 0 12px rgba(251, 191, 36, 0.12);
+  border-radius: 22px;
+}
+
+/* ──────────────────── Profile chip (top-left) ──────────────────── */
+.profile-chip {
+  background: linear-gradient(135deg, rgba(255, 77, 141, 0.30), rgba(251, 191, 36, 0.20));
+  border: 2.5px solid var(--mint);
+  box-shadow: 0 8px 24px rgba(255, 77, 141, 0.45);
+}
+.profile-name {
+  background: linear-gradient(90deg, #fde047, #ff6b9d);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  font-weight: 900;
+}
+.profile-avatar {
+  box-shadow:
+    0 0 0 4px rgba(255, 77, 141, 0.45),
+    0 0 28px rgba(251, 191, 36, 0.55);
+  animation: avatar-glow 3s ease-in-out infinite;
+}
+@keyframes avatar-glow {
+  0%, 100% { filter: brightness(1); }
+  50%      { filter: brightness(1.15) saturate(1.2); }
+}
+
+/* ──────────────────── Subtitle bar — vivid pill instead of plain text ──────────────────── */
+.sub-text, .subtitle-text {
+  background: linear-gradient(90deg, rgba(26, 10, 46, 0.85), rgba(45, 10, 74, 0.85));
+  border: 2px solid var(--mint);
+  border-radius: 22px;
+  padding: 18px 36px;
+  color: #fff;
+  font-weight: 800;
+  box-shadow:
+    0 6px 22px rgba(255, 77, 141, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+/* Hide the empty sub box at t=0 (thumb frame) and after the last segment
+ * clears (final frame). Without this, the padded pill renders as a small
+ * dark rectangle that ruins the thumbnail and last MP4 frame. */
+.sub-text:empty,
+.subtitle-text:empty,
+#subtitle:has(.sub-text:empty) { display: none; }
+
+/* ──────────────────── Scene transition — bounce in ──────────────────── */
+/* The dark theme uses a quick opacity fade. Vivid swaps to a spring scale-up
+   so each scene LANDS with a beat. */
+.scene {
+  animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.scene[data-state="in"], .scene.in {
+  animation: vivid-scene-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes vivid-scene-in {
+  0%   { opacity: 0; transform: scale(0.92) translateY(20px); }
+  60%  { opacity: 1; transform: scale(1.02) translateY(-4px); }
+  100% { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+/* ──────────────────── Promo outro stamp ──────────────────── */
+.promo-outro, .promo-stamp {
+  background: linear-gradient(90deg, #ff4d8d, #fbbf24, #00f5d4);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  font-weight: 900;
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   v0.6 BULLET RHYTHM — anh: "ngột ngạt" / wants more sinh động.
+   Vivid takes the strongest interpretation: every bullet gets its own
+   pair of palette colours (gradient bg), bigger stagger / rotation,
+   and the first bullet pops with a candy shadow.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* 1. Per-bullet card BG cycles through 4 candy-palette gradients. */
+.bullet:nth-child(4n+1) {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--bullet-c1) 30%, transparent),
+    color-mix(in srgb, var(--bullet-c2) 18%, transparent));
+  border-color: var(--bullet-c1);
+}
+.bullet:nth-child(4n+2) {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--bullet-c2) 30%, transparent),
+    color-mix(in srgb, var(--bullet-c3) 18%, transparent));
+  border-color: var(--bullet-c2);
+}
+.bullet:nth-child(4n+3) {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--bullet-c3) 30%, transparent),
+    color-mix(in srgb, var(--bullet-c4) 18%, transparent));
+  border-color: var(--bullet-c3);
+}
+.bullet:nth-child(4n+4) {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--bullet-c4) 30%, transparent),
+    color-mix(in srgb, var(--bullet-c1) 18%, transparent));
+  border-color: var(--bullet-c4);
+}
+
+/* 2. Number circle solid + per-bullet colour. */
+.bullet:nth-child(4n+1) .bullet-num {
+  background: var(--bullet-c1);
+  box-shadow: 0 8px 26px color-mix(in srgb, var(--bullet-c1) 60%, transparent);
+}
+.bullet:nth-child(4n+2) .bullet-num {
+  background: var(--bullet-c2);
+  box-shadow: 0 8px 26px color-mix(in srgb, var(--bullet-c2) 60%, transparent);
+}
+.bullet:nth-child(4n+3) .bullet-num {
+  background: var(--bullet-c3);
+  box-shadow: 0 8px 26px color-mix(in srgb, var(--bullet-c3) 60%, transparent);
+}
+.bullet:nth-child(4n+4) .bullet-num {
+  background: var(--bullet-c4);
+  box-shadow: 0 8px 26px color-mix(in srgb, var(--bullet-c4) 60%, transparent);
+}
+
+/* 3. Lead bullet — pop with candy shadow. */
+.bullet:first-child {
+  font-size: 40px;
+  font-weight: 900;
+  padding: 26px 34px;
+  transform: scale(1.04);
+  transform-origin: left center;
+  box-shadow:
+    0 10px 32px rgba(255, 77, 141, 0.40),
+    0 2px 8px rgba(0, 0, 0, 0.20);
+}
+
+/* 4. Stronger stagger + rotation than dark/bright (vivid = bouncy). */
+.bullet:nth-child(odd)  { margin-left: 0;    transform: rotate(-0.8deg); }
+.bullet:nth-child(even) { margin-left: 36px; transform: rotate(0.8deg); }
+
+/* 5. Karaoke active resets the rotation so the highlighted item reads
+      square + saturated. Higher specificity than the nth-child rule. */
+.bullet.bullet-active {
+  margin-left: 0;
+  transform: rotate(0deg) scale(1.04);
+  z-index: 5;
+  box-shadow: 0 12px 36px rgba(255, 77, 141, 0.55);
+}
